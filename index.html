@@ -954,12 +954,13 @@ function remAction(type){
 
 function remAll(){
   closeOvD('ov-rem');
-  // 1. ICS download (silent)
-  doCalIcs(curId);
+  // 1. Calendario compartido — abre Google Calendar con evento pre-llenado
+  const{task,d,dt,start,end,title,det}=calPayload(curId);
+  window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(det)}&add=${encodeURIComponent(SENDERS.P.email)}&add=${encodeURIComponent(SENDERS.S.email)}`,'_blank');
   // 2. WhatsApp
-  setTimeout(()=>doWA(curId,null),400);
+  setTimeout(()=>doWA(curId,null),600);
   // 3. Email
-  setTimeout(()=>{openMail(curId,null);buildReminderMail(curId);},800);
+  setTimeout(()=>{openMail(curId,null);buildReminderMail(curId);},1100);
 }
 
 function buildReminderMail(id){
@@ -1081,15 +1082,22 @@ function calPayload(id){
   const d=getDate(task);
   const dt=d.replace(/-/g,'');
   const title=task.title+(task.amt?' — '+fmtMXN(task.amt):'');
-  const det='Responsable: '+sender.name+' ('+sender.email+')'+(task.amt?'\nMonto: '+fmtMXN(task.amt):'')
-    +'\n\n¿Terminaste?\n✅ Sí → abre el tablero y arrástrala a LISTO\n❌ No → clic en la fecha para reagendar';
+  const parts=task.title.split(' — ');
+  const empresa=parts[0]||task.title;
+  const accion=parts.slice(1).join(' — ')||'';
+  const det=
+    '📌 Empresa: '+empresa+
+    (accion?'\n📋 Acción: '+accion:'')+
+    '\n👤 Responsable: '+sender.name+' ('+sender.email+')'+
+    (task.amt?'\n💰 Monto: '+fmtMXN(task.amt):'')+
+    '\n\n¿Terminaste?\n✅ Sí → abre el tablero y arrástrala a LISTO\n❌ No → clic en la fecha para reagendar';
   return{task,d,dt,start:dt+'T090000',end:dt+'T093000',title,det};
 }
 function doCal(type){
   const{task,d,dt,start,end,title,det}=calPayload(curId);
   if(type==='shared'){
-    // Abre el calendario compartido Barcón & Mijares directamente
-    window.open(CALENDAR_URL,'_blank');
+    // Abre Google Calendar con el evento pre-llenado (título + descripción + invitados)
+    window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(det)}&add=${encodeURIComponent(SENDERS.P.email)}&add=${encodeURIComponent(SENDERS.S.email)}`,'_blank');
   }else if(type==='google'){
     window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(det)}&add=${encodeURIComponent(SENDERS.P.email)}&add=${encodeURIComponent(SENDERS.S.email)}`,'_blank');
   }else if(type==='outlook'){
