@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pendientes — Barcón & Mijares</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#EDF1F7;color:#1a1a2e;min-height:100vh;}
+
+/* ─── HEADER ─── */
+header{background:linear-gradient(135deg,#1F3864 0%,#2E75B6 100%);color:white;padding:11px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 3px 14px rgba(0,0,0,.28);position:sticky;top:0;z-index:300;flex-wrap:wrap;gap:8px;}
+header h1{font-size:16px;font-weight:700;}
+header .sub{font-size:10px;opacity:.7;margin-top:1px;}
+.hdr-r{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.kpi{background:rgba(255,255,255,.13);border-radius:7px;padding:4px 11px;text-align:center;}
+.kpi .v{font-size:14px;font-weight:700;} .kpi .l{font-size:9px;opacity:.72;text-transform:uppercase;letter-spacing:.4px;}
+#v-cob{color:#FFD700;}
+.toggle{display:flex;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,.28);}
+.toggle button{background:rgba(255,255,255,.1);color:white;border:none;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s;}
+.toggle button.on{background:rgba(255,255,255,.3);}
+.toggle button:hover{background:rgba(255,255,255,.2);}
+.btn-hdr{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:white;padding:4px 10px;border-radius:5px;font-size:11px;cursor:pointer;}
+.btn-hdr:hover{background:rgba(255,255,255,.2);}
+.btn-new{background:#FFD700;border:none;color:#1F3864;padding:5px 13px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:4px;transition:background .15s;letter-spacing:.3px;}
+.btn-new:hover{background:#FFC200;}
+
+/* ─── NEW TASK FORM ─── */
+.ntf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:13px 17px;}
+.ntf-grid .field.full{grid-column:1/-1;}
+.ntf-select{width:100%;border:1.5px solid #DDE3EC;border-radius:6px;padding:7px 9px;font-size:12px;font-family:inherit;color:#1a1a2e;background:white;appearance:none;cursor:pointer;}
+.ntf-select:focus{outline:none;border-color:#2E75B6;}
+.ntf-footer{padding:10px 17px 18px;display:flex;gap:8px;}
+.btn-create{flex:1;background:#1F3864;color:white;border:none;border-radius:8px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-create:hover{background:#2E75B6;}
+.btn-cancel-new{background:#F2F4F7;color:#555;border:none;border-radius:8px;padding:12px 16px;font-size:13px;font-weight:600;cursor:pointer;}
+.btn-cancel-new:hover{background:#E0E4EC;}
+.tipo-row{display:flex;gap:6px;}
+.tipo-btn{flex:1;padding:8px 6px;border:1.5px solid #DDE3EC;border-radius:7px;background:#F7F9FC;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;}
+.tipo-btn.sel{border-color:#2E75B6;background:#EBF3FB;color:#1F3864;}
+.tipo-btn:hover{border-color:#2E75B6;}
+
+/* ─── TODAY BANNER ─── */
+#today-banner{display:none;background:#FFF3CD;border-bottom:2px solid #FFD54F;padding:8px 18px;font-size:12px;color:#5D4037;}
+#today-banner strong{color:#E65100;}
+.banner-tasks{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;}
+.banner-chip{background:#FF8F00;color:white;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;}
+
+/* ─── PROGRESS ─── */
+.prog-wrap{padding:6px 18px 0;}
+.prog-bg{background:#D8E1EC;border-radius:20px;height:5px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,#3AAA35,#70C264);border-radius:20px;transition:width .4s;}
+.prog-lbl{font-size:9px;color:#8a9ab5;text-align:right;margin-top:2px;}
+
+/* ─── LEGEND ─── */
+.legend{display:flex;gap:10px;padding:6px 18px;background:#E3E9F3;font-size:10px;color:#556;border-bottom:1px solid #CDD5E2;flex-wrap:wrap;align-items:center;}
+.legend span{display:flex;align-items:center;gap:3px;}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.bdg{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;box-shadow:0 2px 7px rgba(0,0,0,.22);letter-spacing:0;line-height:1;}
+.bdg-P{background:#1D4ED8;color:white;}
+.bdg-S{background:#16A34A;color:white;}
+
+/* ─── BOARD ─── */
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:12px 14px 50px;align-items:start;}
+.col{background:white;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.07);min-height:150px;transition:box-shadow .2s;}
+.col-hdr{border-radius:10px 10px 0 0;}
+.col.drag-over{box-shadow:0 0 0 3px #2E75B6,0 4px 20px rgba(46,117,182,.25);}
+.col-hdr{padding:9px 12px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid rgba(0,0,0,.07);}
+.col-hdr .cnt{background:rgba(0,0,0,.1);border-radius:9px;padding:1px 7px;font-size:10px;}
+.col[data-s="URGENTE"]    .col-hdr{background:#FFF0E6;color:#B94000;}
+.col[data-s="EN PROCESO"] .col-hdr{background:#FFFBE6;color:#7D5A00;}
+.col[data-s="PENDIENTE"]  .col-hdr{background:#F2F6FB;color:#1F3864;}
+.col[data-s="LISTO"]      .col-hdr{background:#EEF8EC;color:#2D6A1E;}
+
+/* ─── CARDS ─── */
+.cards{padding:8px 7px;display:flex;flex-direction:column;gap:7px;min-height:60px;}
+.card{background:#FAFBFC;border:1.5px solid #E4E9F0;border-radius:8px;padding:9px 10px;border-left:4px solid #ccc;transition:box-shadow .15s;user-select:none;}
+.card:hover{box-shadow:0 3px 12px rgba(0,0,0,.1);}
+.card.dragging{opacity:.35;transform:rotate(2deg);}
+.col[data-s="URGENTE"]    .card{border-left-color:#E8612A;background:#FFFAF7;}
+.col[data-s="EN PROCESO"] .card{border-left-color:#F5C518;background:#FFFEF5;}
+.col[data-s="PENDIENTE"]  .card{border-left-color:#2E75B6;}
+.col[data-s="LISTO"]      .card{border-left-color:#3AAA35;opacity:.6;}
+/* today/overdue highlights */
+.card.is-today  {border:2px solid #FF8F00;background:#FFFDE7;}
+.card.is-overdue{border:2px solid #C62828;background:#FFF5F5;}
+
+.card-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;}
+.card-title{font-size:12px;font-weight:600;color:#1a1a2e;line-height:1.3;cursor:grab;flex:1;}
+.col[data-s="LISTO"] .card-title{text-decoration:line-through;color:#999;}
+.card-badges{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+.tag{font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;white-space:nowrap;}
+.tag-hoy  {background:#FF8F00;color:white;}
+.tag-venc {background:#C62828;color:white;}
+
+.card-row2{display:flex;align-items:center;justify-content:space-between;margin-top:6px;gap:6px;flex-wrap:wrap;}
+.date-btn{font-size:10px;font-weight:600;color:#555;background:#F0F4FA;border:1px solid #D8E1ED;border-radius:5px;padding:2px 7px;cursor:pointer;white-space:nowrap;}
+.date-btn:hover{background:#E2EAF6;border-color:#2E75B6;}
+.card-amt{font-size:11px;font-weight:700;color:#AAAAAA;}
+.card-amt.eom{color:#111111;font-size:12px;}
+
+/* date popover */
+.dpop-wrap{position:static;}
+.dpop{display:none;position:fixed;z-index:9999;background:white;border:1.5px solid #2E75B6;border-radius:8px;padding:10px;box-shadow:0 6px 24px rgba(0,0,0,.18);min-width:190px;}
+.dpop.open{display:block;}
+.dpop input{border:1px solid #D0D8E8;border-radius:5px;padding:5px 8px;font-size:12px;width:100%;}
+.dpop-acts{display:flex;gap:5px;margin-top:6px;}
+.dpop-ok{background:#2E75B6;color:white;border:none;border-radius:5px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer;flex:1;}
+.dpop-cancel{background:#EEF0F4;color:#555;border:none;border-radius:5px;padding:4px 8px;font-size:10px;cursor:pointer;}
+
+/* card actions */
+.card-acts{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap;}
+.ba{border:none;border-radius:5px;padding:3px 7px;font-size:11px;font-weight:600;cursor:pointer;transition:all .13s;display:flex;align-items:center;gap:2px;}
+.ba-adv{background:#EBF3FB;color:#1F3864;flex:1;justify-content:center;}
+.ba-adv:hover{background:#2E75B6;color:white;}
+.col[data-s="LISTO"] .ba-adv{background:#FFF0E6;color:#B94000;}
+.col[data-s="LISTO"] .ba-adv:hover{background:#E8612A;color:white;}
+.ba-mail{background:#FEF2F2;color:#991B1B;} .ba-mail:hover{background:#991B1B;color:white;}
+.ba-cal {background:#F0F4FF;color:#1D4ED8;} .ba-cal:hover{background:#1D4ED8;color:white;}
+.ba-wa  {background:#E8F5E9;color:#1B5E20;} .ba-wa:hover{background:#25D366;color:white;}
+
+/* Sí/No quick bar (for today + overdue) */
+.yn-bar{display:flex;gap:5px;margin-top:6px;padding-top:6px;border-top:1px dashed #E0E0E0;}
+.yn-lbl{font-size:10px;color:#888;align-self:center;flex:1;}
+.yn-si{background:#2E7D32;color:white;border:none;border-radius:5px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;}
+.yn-si:hover{background:#1B5E20;}
+.yn-no{background:#C62828;color:white;border:none;border-radius:5px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;}
+.yn-no:hover{background:#B71C1C;}
+
+/* ─── OVERLAYS ─── */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:flex-end;justify-content:center;}
+.ov.open{display:flex;}
+.modal{background:white;border-radius:14px 14px 0 0;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 -6px 30px rgba(0,0,0,.22);animation:su .22s ease;}
+@keyframes su{from{transform:translateY(28px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.mhdr{padding:15px 17px 11px;border-bottom:1px solid #EEF0F4;display:flex;justify-content:space-between;align-items:flex-start;}
+.mtitle{font-size:13px;font-weight:700;color:#1F3864;line-height:1.3;}
+.msub{font-size:10px;color:#888;margin-top:2px;}
+.bx{background:#F2F4F7;border:none;border-radius:50%;width:26px;height:26px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.mbody{padding:13px 17px;}
+.field{margin-bottom:10px;}
+.field label{font-size:10px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:3px;}
+.field input,.field textarea{width:100%;border:1.5px solid #DDE3EC;border-radius:6px;padding:7px 9px;font-size:12px;font-family:inherit;color:#1a1a2e;transition:border-color .15s;}
+.field input:focus,.field textarea:focus{outline:none;border-color:#2E75B6;}
+.field textarea{height:150px;resize:vertical;line-height:1.5;}
+.from-row{display:flex;align-items:center;gap:7px;}
+.from-bdg{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+.mfooter{padding:9px 17px 17px;display:flex;gap:7px;flex-wrap:wrap;}
+.bsend{flex:1;padding:10px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;min-width:130px;}
+.bsend:hover{opacity:.88;}
+.s-gm{background:#C5221F;color:white;} .s-ol{background:#0F4DA1;color:white;} .s-mt{background:#404040;color:white;flex:0;min-width:100px;}
+
+/* Reminder modal */
+.rem-info{margin:13px 17px 0;background:#EBF3FB;border:1px solid #BFD9F0;border-radius:8px;padding:10px 13px;font-size:12px;color:#1F3864;line-height:1.6;}
+.rem-info strong{font-size:13px;}
+.rem-opts{padding:12px 17px 6px;display:flex;flex-direction:column;gap:7px;}
+.rem-opt{display:flex;align-items:center;gap:11px;padding:11px 13px;border:1.5px solid #E0E6EF;border-radius:9px;background:#FAFBFC;cursor:pointer;transition:all .15s;text-align:left;width:100%;}
+.rem-opt:hover{background:#EBF3FB;border-color:#2E75B6;}
+.rem-opt .ico{font-size:20px;width:28px;text-align:center;flex-shrink:0;}
+.rem-opt .det{flex:1;line-height:1.4;}
+.rem-opt .det strong{font-size:12px;color:#1F3864;}
+.rem-opt .det small{display:block;font-size:10px;color:#888;}
+.rem-all{margin:4px 17px 17px;background:#1F3864;color:white;border:none;border-radius:9px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;width:calc(100% - 34px);display:flex;align-items:center;justify-content:center;gap:8px;}
+.rem-all:hover{background:#2E75B6;}
+
+/* Cal options */
+.cal-opts{padding:12px 17px 17px;display:flex;flex-direction:column;gap:7px;}
+.cal-opt{display:flex;align-items:center;gap:11px;padding:11px 13px;border:1.5px solid #E0E6EF;border-radius:9px;background:#FAFBFC;cursor:pointer;transition:all .15s;text-align:left;width:100%;}
+.cal-opt:hover{background:#EBF3FB;border-color:#2E75B6;}
+.cal-opt .ico{font-size:20px;width:28px;text-align:center;}
+.cal-opt .det strong{font-size:12px;color:#1F3864;display:block;}
+.cal-opt .det small{font-size:10px;color:#888;}
+
+/* Reschedule modal */
+.yn-modal-body{padding:16px 17px;}
+.yn-msg{font-size:13px;color:#333;line-height:1.5;margin-bottom:14px;}
+.yn-modal-actions{display:flex;gap:8px;margin-top:4px;}
+.yn-btn-si{flex:1;background:#2E7D32;color:white;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;}
+.yn-btn-si:hover{background:#1B5E20;}
+.yn-btn-no{flex:1;background:#F5F5F5;color:#333;border:1.5px solid #CCC;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;}
+.yn-btn-no:hover{background:#EEE;}
+.yn-btn-del{width:100%;margin-top:8px;background:none;border:none;color:#BDBDBD;font-size:11px;cursor:pointer;padding:5px;transition:color .15s;text-align:center;}
+.yn-btn-del:hover{color:#C62828;}
+.reschedule-area{display:none;margin-top:12px;padding-top:12px;border-top:1px solid #EEE;}
+.reschedule-area label{font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
+.reschedule-area input{border:1.5px solid #DDE3EC;border-radius:6px;padding:8px 10px;font-size:13px;width:100%;}
+.reschedule-area .rsave{margin-top:8px;background:#2E75B6;color:white;border:none;border-radius:7px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;width:100%;}
+.reschedule-area .rsave:hover{background:#1F3864;}
+
+/* Briefing modal */
+.brief-list{padding:10px 17px 4px;display:flex;flex-direction:column;gap:8px;}
+.brief-item{background:#F7F9FC;border:1px solid #E0E8F0;border-radius:10px;border-left:4px solid #2E75B6;overflow:hidden;transition:box-shadow .15s;}
+.brief-item:hover{box-shadow:0 3px 14px rgba(0,0,0,.1);}
+.brief-item.overdue{border-left-color:#C62828;background:#FFF5F5;}
+.brief-item.today  {border-left-color:#FF8F00;background:#FFFDE7;}
+.brief-item-hdr{display:flex;align-items:center;gap:9px;padding:10px 12px 6px;}
+.brief-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:9px;white-space:nowrap;}
+.brief-tag.ov{background:#C62828;color:white;} .brief-tag.td{background:#FF8F00;color:white;}
+.brief-item-title{font-size:12px;font-weight:700;flex:1;color:#1a1a2e;line-height:1.35;}
+.brief-item-who{font-size:10px;color:#888;white-space:nowrap;}
+.brief-item-meta{display:flex;align-items:center;gap:10px;padding:0 12px 8px;flex-wrap:wrap;}
+.brief-meta-pill{font-size:10px;color:#666;background:rgba(0,0,0,.05);border-radius:5px;padding:2px 7px;}
+.brief-meta-amt{font-size:11px;font-weight:700;color:#1F3864;}
+.brief-item-acts{display:flex;border-top:1px solid rgba(0,0,0,.06);overflow:hidden;}
+.brief-act{flex:1;border:none;background:none;padding:9px 4px;font-size:11px;font-weight:700;cursor:pointer;transition:background .13s;display:flex;align-items:center;justify-content:center;gap:4px;}
+.brief-act+.brief-act{border-left:1px solid rgba(0,0,0,.06);}
+.brief-act-done{color:#2E7D32;} .brief-act-done:hover{background:#E8F5E9;}
+.brief-act-sched{color:#1565C0;} .brief-act-sched:hover{background:#E3F2FD;}
+.brief-act-edit{color:#5D4037;} .brief-act-edit:hover{background:#EFEBE9;}
+.brief-close{margin:12px 17px 17px;background:#1F3864;color:white;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;width:calc(100% - 34px);}
+.brief-close:hover{background:#2E75B6;}
+
+.empty{text-align:center;color:#C0CAD8;font-size:11px;padding:22px 8px;}
+
+/* ─── TABS ─── */
+.tabs-bar{display:flex;background:white;border-bottom:2px solid #E0E6EF;padding:0 14px;gap:2px;}
+.tab-btn{padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:none;color:#8a9ab5;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;display:flex;align-items:center;gap:5px;}
+.tab-btn.active{color:#1F3864;border-bottom-color:#1F3864;}
+.tab-btn:hover:not(.active){color:#2E75B6;}
+
+/* ─── CALENDAR VIEW ─── */
+#cal-view{display:none;padding:12px 14px 50px;}
+#cal-view.active{display:block;}
+#board-view.hidden{display:none;}
+.cal-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.cal-topbar h2{font-size:15px;font-weight:700;color:#1F3864;text-transform:capitalize;}
+.cal-nav-btns{display:flex;gap:6px;align-items:center;}
+.cal-nav-btn{background:#F0F4FA;border:1px solid #D8E1ED;color:#1F3864;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;transition:all .13s;}
+.cal-nav-btn:hover{background:#1F3864;color:white;border-color:#1F3864;}
+.cal-nav-btn.today-btn{background:#FF8F00;color:white;border-color:#FF8F00;}
+.cal-legend{display:flex;gap:8px;flex-wrap:wrap;}
+.cal-leg{font-size:10px;font-weight:700;display:flex;align-items:center;gap:4px;}
+.cal-leg-dot{width:9px;height:9px;border-radius:2px;display:inline-block;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.cal-dh{text-align:center;font-size:10px;font-weight:700;color:#8a9ab5;text-transform:uppercase;padding:5px 2px;}
+.cal-day{min-height:86px;background:white;border:1px solid #E4E9F0;border-radius:8px;padding:6px 5px;transition:box-shadow .12s;}
+.cal-day:hover{box-shadow:0 2px 10px rgba(0,0,0,.09);}
+.cal-day.is-today{border:2px solid #FF8F00;background:#FFFDF5;}
+.cal-day.has-overdue{border-color:#C62828;}
+.cal-day.other-month{background:#F7F9FC;opacity:.45;}
+.cal-day.empty-day{background:transparent;border:none;}
+.cal-dn{font-size:11px;font-weight:700;color:#666;margin-bottom:4px;text-align:right;}
+.cal-day.is-today .cal-dn{color:#FF8F00;background:#FF8F00;color:white;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;margin-left:auto;}
+.cal-day.has-overdue .cal-dn{color:#C62828;}
+.cal-pill{font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;margin-bottom:2px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;border-left:3px solid transparent;transition:opacity .1s;line-height:1.4;}
+.cal-pill:hover{opacity:.72;transform:scale(1.01);}
+.cp-U{background:#FFF0E6;color:#B94000;border-left-color:#E8612A;}
+.cp-E{background:#FFFBE6;color:#7D5A00;border-left-color:#F5C518;}
+.cp-P{background:#EBF3FB;color:#1F3864;border-left-color:#2E75B6;}
+.cp-L{background:#EEF8EC;color:#2D6A1E;border-left-color:#3AAA35;opacity:.55;}
+.cal-more{font-size:9px;color:#aaa;margin-top:2px;cursor:pointer;}
+.cal-more:hover{color:#2E75B6;}
+.cal-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.cal-sum-card{background:white;border-radius:9px;padding:10px 14px;border-left:4px solid #ccc;box-shadow:0 1px 5px rgba(0,0,0,.06);}
+.cal-sum-card.s-U{border-left-color:#E8612A;} .cal-sum-card.s-E{border-left-color:#F5C518;}
+.cal-sum-card.s-P{border-left-color:#2E75B6;} .cal-sum-card.s-L{border-left-color:#3AAA35;}
+.cal-sum-n{font-size:22px;font-weight:800;color:#1a1a2e;} .cal-sum-l{font-size:10px;color:#888;margin-top:1px;}
+@media(max-width:700px){.cal-grid{grid-template-columns:repeat(7,1fr);gap:2px;}.cal-day{min-height:58px;padding:4px 3px;}.cal-pill{font-size:8px;}.cal-summary{grid-template-columns:repeat(2,1fr);}}
+
+/* ─── EDIT BUTTON ─── */
+.card-edit-btn{background:none;border:none;cursor:pointer;font-size:12px;opacity:0;padding:0 2px;transition:opacity .15s;line-height:1;flex-shrink:0;}
+.card:hover .card-edit-btn{opacity:0.55;}
+.card-edit-btn:hover{opacity:1!important;transform:scale(1.15);}
+
+/* ─── TOOLTIP (global, posición fija) ─── */
+#global-tt{display:none;position:fixed;z-index:9997;background:#1a1a2e;color:white;border-radius:10px;padding:12px 15px;min-width:210px;max-width:290px;box-shadow:0 8px 30px rgba(0,0,0,.4);font-size:11px;line-height:1.65;pointer-events:none;transition:opacity .1s;}
+#global-tt.show{display:block;}
+#global-tt .tt-title{font-size:12px;font-weight:700;color:#FFD700;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:6px;margin-bottom:7px;line-height:1.4;}
+#global-tt .tt-row{display:flex;gap:6px;margin-bottom:2px;}
+#global-tt .tt-lbl{opacity:.55;min-width:72px;flex-shrink:0;}
+#global-tt .tt-val{font-weight:600;}
+#global-tt .tt-notes{margin-top:7px;padding-top:6px;border-top:1px solid rgba(255,255,255,.13);font-size:10px;opacity:.65;line-height:1.5;}
+#global-tt .tt-hint{margin-top:7px;font-size:9px;opacity:.4;text-align:right;}
+
+@media(max-width:860px){.board{grid-template-columns:1fr 1fr;}}
+@media(max-width:500px){.board{grid-template-columns:1fr;}.hdr-r .kpi{display:none;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>PENDIENTES — BARCÓN &amp; MIJARES</h1>
+    <div class="sub">Arrastra tarjetas · Clic en fecha = recordatorio automático · 💬 📅 📧 en cada tarjeta</div>
+  </div>
+  <div class="hdr-r">
+    <div class="kpi"><div class="v" id="v-listo">—</div><div class="l">Listas</div></div>
+    <div class="kpi"><div class="v" id="v-cob">—</div><div class="l">Por cobrar</div></div>
+    <button class="btn-hdr" onclick="reopenBriefing()" title="Ver pendientes del día">📋 Pendientes</button>
+    <button class="btn-new" onclick="openNewTask()">＋ Nueva tarea</button>
+    <button class="btn-hdr" onclick="resetAll()">↺ Reiniciar</button>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <button class="tab-btn active" id="tab-board"   onclick="switchTab('board')">📋 Tablero</button>
+  <button class="tab-btn"        id="tab-calendar" onclick="switchTab('calendar')">📅 Calendario</button>
+</div>
+
+<!-- TODAY BANNER -->
+<div id="today-banner"></div>
+
+<div class="prog-wrap">
+  <div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="prog-lbl" id="prog-lbl">—</div>
+</div>
+<div class="legend">
+  <strong>LEYENDA:</strong>
+  <span><span class="dot" style="background:#E8612A"></span>Urgente</span>
+  <span><span class="dot" style="background:#F5C518"></span>En proceso</span>
+  <span><span class="dot" style="background:#2E75B6"></span>Pendiente</span>
+  <span><span class="dot" style="background:#3AAA35"></span>Listo</span>
+  <span><span class="dot" style="background:#FF8F00"></span>📅 HOY</span>
+  <span><span class="dot" style="background:#C62828"></span>⚠️ Vencida</span>
+  <span style="margin-left:auto">
+    <span class="bdg bdg-P">P</span> panchingasm@gmail.com &nbsp;
+    <span class="bdg bdg-S">S</span> sanbarcon@gmail.com
+  </span>
+</div>
+
+<div id="board-view">
+<div class="board">
+  <div class="col" data-s="URGENTE"    ondragover="dov(event,this)" ondragleave="dlv(this)" ondrop="drp(event,'URGENTE')">
+    <div class="col-hdr">🔴 Urgente — esta semana <span class="cnt" id="cnt-URGENTE">0</span></div>
+    <div class="cards" id="cards-URGENTE"></div>
+  </div>
+  <div class="col" data-s="EN PROCESO" ondragover="dov(event,this)" ondragleave="dlv(this)" ondrop="drp(event,'EN PROCESO')">
+    <div class="col-hdr">🔵 En proceso <span class="cnt" id="cnt-EN PROCESO">0</span></div>
+    <div class="cards" id="cards-EN PROCESO"></div>
+  </div>
+  <div class="col" data-s="PENDIENTE"  ondragover="dov(event,this)" ondragleave="dlv(this)" ondrop="drp(event,'PENDIENTE')">
+    <div class="col-hdr">⚪ Pendiente  <span class="cnt" id="cnt-PENDIENTE">0</span></div>
+    <div class="cards" id="cards-PENDIENTE"></div>
+  </div>
+  <div class="col" data-s="LISTO"      ondragover="dov(event,this)" ondragleave="dlv(this)" ondrop="drp(event,'LISTO')">
+    <div class="col-hdr">✅ Listo      <span class="cnt" id="cnt-LISTO">0</span></div>
+    <div class="cards" id="cards-LISTO"></div>
+  </div>
+</div>
+</div>
+
+<!-- ══ VISTA CALENDARIO ══ -->
+<div id="cal-view">
+  <!-- Resumen numérico -->
+  <div class="cal-summary">
+    <div class="cal-sum-card s-U"><div class="cal-sum-n" id="cs-U">0</div><div class="cal-sum-l">🔴 Urgente</div></div>
+    <div class="cal-sum-card s-E"><div class="cal-sum-n" id="cs-E">0</div><div class="cal-sum-l">🔵 En proceso</div></div>
+    <div class="cal-sum-card s-P"><div class="cal-sum-n" id="cs-P">0</div><div class="cal-sum-l">⚪ Pendiente</div></div>
+    <div class="cal-sum-card s-L"><div class="cal-sum-n" id="cs-L">0</div><div class="cal-sum-l">✅ Listo</div></div>
+  </div>
+  <!-- Navegación mes -->
+  <div class="cal-topbar">
+    <h2 id="cal-month-label">—</h2>
+    <div class="cal-nav-btns">
+      <button class="cal-nav-btn today-btn" onclick="calGoToday()">Hoy</button>
+      <button class="cal-nav-btn" onclick="calPrev()">◀ Anterior</button>
+      <button class="cal-nav-btn" onclick="calNext()">Siguiente ▶</button>
+    </div>
+    <div class="cal-legend">
+      <span class="cal-leg"><span class="cal-leg-dot" style="background:#E8612A"></span>Urgente</span>
+      <span class="cal-leg"><span class="cal-leg-dot" style="background:#F5C518"></span>En proceso</span>
+      <span class="cal-leg"><span class="cal-leg-dot" style="background:#2E75B6"></span>Pendiente</span>
+      <span class="cal-leg"><span class="cal-leg-dot" style="background:#3AAA35"></span>Listo</span>
+    </div>
+  </div>
+  <!-- Grid del mes — generado por renderCalendar() -->
+  <div class="cal-grid" id="cal-grid"></div>
+</div>
+
+<!-- ══ MODAL: EMAIL ══ -->
+<div class="ov" id="ov-mail" onclick="closeOv('ov-mail',event)">
+  <div class="modal">
+    <div class="mhdr">
+      <div><div class="mtitle" id="mail-title"></div><div class="msub" id="mail-sub"></div></div>
+      <button class="bx" onclick="closeOvD('ov-mail')">×</button>
+    </div>
+    <div class="mbody">
+      <div class="field"><label>De</label><div class="from-row"><span class="from-bdg" id="mail-fbdg"></span><input id="mail-from" readonly style="background:#F7F9FC;color:#666;"></div></div>
+      <div class="field"><label>Para</label><input id="mail-to" type="email" placeholder="correo@cliente.com"></div>
+      <div class="field"><label>Asunto</label><input id="mail-subj"></div>
+      <div class="field"><label>Mensaje</label><textarea id="mail-body"></textarea></div>
+    </div>
+    <div class="mfooter">
+      <button class="bsend s-gm" onclick="sendMail('gmail')">✉ Enviar por Gmail</button>
+      <button class="bsend s-mt" onclick="sendMail('mailto')">📨 App local</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CALENDARIO ══ -->
+<div class="ov" id="ov-cal" onclick="closeOv('ov-cal',event)">
+  <div class="modal">
+    <div class="mhdr">
+      <div><div class="mtitle" id="cal-title">Agregar al calendario</div><div class="msub" id="cal-sub"></div></div>
+      <button class="bx" onclick="closeOvD('ov-cal')">×</button>
+    </div>
+    <div class="cal-opts">
+      <button class="cal-opt" onclick="doCal('shared')" style="border-color:#1F3864;background:#EBF3FB;">
+        <span class="ico">🗓️</span><div class="det"><strong style="color:#1F3864;">Calendario compartido Barcón &amp; Mijares</strong><small>Lo ven tanto Pancho como Santiago · Recomendado</small></div>
+      </button>
+      <button class="cal-opt" onclick="doCal('google')">
+        <span class="ico">📅</span><div class="det"><strong>Google Calendar — nuevo evento</strong><small>Crea evento en tu calendario personal</small></div>
+      </button>
+      <button class="cal-opt" onclick="doCal('ics')">
+        <span class="ico">⬇️</span><div class="det"><strong>Descargar .ics</strong><small>Compatible con Apple, Google y Outlook · Con alarma a las 9 am</small></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: ACTIVAR RECORDATORIOS (al guardar fecha) ══ -->
+<div class="ov" id="ov-rem" onclick="closeOv('ov-rem',event)">
+  <div class="modal">
+    <div class="mhdr">
+      <div><div class="mtitle">🔔 ¿Activar recordatorios?</div><div class="msub" id="rem-sub"></div></div>
+      <button class="bx" onclick="closeOvD('ov-rem')">×</button>
+    </div>
+    <div class="rem-info" id="rem-info"></div>
+    <div class="rem-opts">
+      <button class="rem-opt" onclick="remAction('cal')">
+        <span class="ico">📅</span><div class="det"><strong>Agregar al calendario</strong><small>Crea el evento con alarma ese mismo día a las 9 am</small></div>
+      </button>
+      <button class="rem-opt" onclick="remAction('wa')">
+        <span class="ico">💬</span><div class="det"><strong>Recordatorio por WhatsApp</strong><small>Abre WhatsApp con el mensaje listo para enviarte a ti mismo</small></div>
+      </button>
+      <button class="rem-opt" onclick="remAction('mail')">
+        <span class="ico">📧</span><div class="det"><strong>Recordatorio por correo</strong><small>Redacta el correo de recordatorio con instrucciones de Sí / No</small></div>
+      </button>
+    </div>
+    <button class="rem-all" onclick="remAll()">🚀 Activar los tres recordatorios</button>
+    <button onclick="closeOvD('ov-rem')" style="display:block;width:calc(100% - 34px);margin:0 17px 16px;background:none;border:none;color:#AAB;font-size:12px;cursor:pointer;padding:6px;text-decoration:underline;">Ahora no, cerrar</button>
+  </div>
+</div>
+
+<!-- ══ MODAL: SÍ / NO ══ -->
+<div class="ov" id="ov-yn" onclick="closeOv('ov-yn',event)">
+  <div class="modal">
+    <div class="mhdr">
+      <div><div class="mtitle" id="yn-title">¿Terminaste la tarea?</div><div class="msub" id="yn-sub"></div></div>
+      <button class="bx" onclick="closeOvD('ov-yn')">×</button>
+    </div>
+    <div class="yn-modal-body">
+      <div class="yn-msg" id="yn-msg"></div>
+      <div class="yn-modal-actions">
+        <button class="yn-btn-si" onclick="ynSi()">✅ Sí, la terminé</button>
+        <button class="yn-btn-no" onclick="showReschedule()">❌ No, reagendar</button>
+      </div>
+      <button class="yn-btn-del" onclick="ynDelete()">🗑 Eliminar tarea del tablero</button>
+      <div class="reschedule-area" id="reschedule-area">
+        <label>Nueva fecha</label>
+        <input type="date" id="new-date-input">
+        <button class="rsave" onclick="doReschedule()">Guardar nueva fecha y activar recordatorios →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: NUEVA TAREA ══ -->
+<div class="ov" id="ov-new" onclick="closeOv('ov-new',event)">
+  <div class="modal" style="max-width:640px;">
+    <div class="mhdr">
+      <div><div class="mtitle">＋ Nueva tarea</div><div class="msub">Completa los datos · el correo se genera automáticamente</div></div>
+      <button class="bx" onclick="closeOvD('ov-new')">×</button>
+    </div>
+    <div class="ntf-grid">
+
+      <!-- Empresa -->
+      <div class="field full">
+        <label>Empresa / Cliente *</label>
+        <input id="nt-empresa" type="text" placeholder="Ej: SUBURBIA, MABE, CARLOS GRIS…" style="width:100%;border:1.5px solid #DDE3EC;border-radius:6px;padding:7px 9px;font-size:12px;font-family:inherit;">
+      </div>
+
+      <!-- Descripción -->
+      <div class="field full">
+        <label>Descripción / Acción a realizar *</label>
+        <input id="nt-desc" type="text" placeholder="Ej: Cobrar pago pendiente, Enviar propuesta, Dar seguimiento…" style="width:100%;border:1.5px solid #DDE3EC;border-radius:6px;padding:7px 9px;font-size:12px;font-family:inherit;">
+      </div>
+
+      <!-- Responsable -->
+      <div class="field">
+        <label>Responsable *</label>
+        <div class="tipo-row">
+          <div class="tipo-btn sel" id="nt-p-btn" onclick="selectWho('P')">
+            <span class="bdg bdg-P">P</span><br><span style="font-size:10px;color:#555;">Pancho</span>
+          </div>
+          <div class="tipo-btn" id="nt-s-btn" onclick="selectWho('S')">
+            <span class="bdg bdg-S">S</span><br><span style="font-size:10px;color:#555;">Santiago</span>
+          </div>
+        </div>
+        <input type="hidden" id="nt-who" value="P">
+      </div>
+
+      <!-- Columna -->
+      <div class="field">
+        <label>Estado inicial *</label>
+        <select id="nt-status" class="ntf-select">
+          <option value="URGENTE">🔴 Urgente</option>
+          <option value="EN PROCESO">🔵 En proceso</option>
+          <option value="PENDIENTE" selected>⚪ Pendiente</option>
+        </select>
+      </div>
+
+      <!-- Fecha -->
+      <div class="field">
+        <label>Fecha de realización *</label>
+        <input id="nt-date" type="date" style="width:100%;border:1.5px solid #DDE3EC;border-radius:6px;padding:7px 9px;font-size:12px;font-family:inherit;">
+      </div>
+
+      <!-- Monto -->
+      <div class="field">
+        <label>Monto a cobrar (opcional)</label>
+        <input id="nt-amt" type="number" min="0" step="0.01" placeholder="0.00" style="width:100%;border:1.5px solid #DDE3EC;border-radius:6px;padding:7px 9px;font-size:12px;font-family:inherit;">
+      </div>
+
+      <!-- Email contacto -->
+      <div class="field full">
+        <label>Correo del contacto (opcional)</label>
+        <input id="nt-email" type="email" placeholder="contacto@empresa.com" style="width:100%;border:1.5px solid #DDE3EC;border-radius:6px;padding:7px 9px;font-size:12px;font-family:inherit;">
+      </div>
+
+      <!-- Notas adicionales -->
+      <div class="field full">
+        <label>Notas adicionales (se incluirán en el correo)</label>
+        <textarea id="nt-notas" placeholder="Antecedentes, detalles importantes, acuerdos previos…" style="width:100%;border:1.5px solid #DDE3EC;border-radius:6px;padding:7px 9px;font-size:12px;font-family:inherit;height:80px;resize:vertical;line-height:1.5;"></textarea>
+      </div>
+
+    </div>
+    <div class="ntf-footer">
+      <button class="btn-cancel-new" onclick="closeOvD('ov-new')">Cancelar</button>
+      <button class="btn-create" onclick="saveNewTask()">✅ Crear tarea y activar recordatorios →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: EDITAR TAREA ══ -->
+<div class="ov" id="ov-edit" onclick="closeOv('ov-edit',event)">
+  <div class="modal">
+    <div class="mhdr">
+      <div><div class="mtitle">✏️ Editar tarea</div><div class="msub" id="edit-sub">Modifica los detalles</div></div>
+      <button class="bx" onclick="closeOvD('ov-edit')">×</button>
+    </div>
+    <input type="hidden" id="edit-id">
+    <div class="ntf-grid">
+
+      <!-- Título -->
+      <div class="field full">
+        <label>Título de la tarea *</label>
+        <input id="edit-title" type="text" placeholder="Empresa — descripción de la acción" style="width:100%;border:1.5px solid #DDE3EC;border-radius:6px;padding:7px 9px;font-size:12px;font-family:inherit;">
+      </div>
+
+      <!-- Responsable -->
+      <div class="field">
+        <label>Responsable</label>
+        <div class="tipo-row">
+          <button id="edit-who-P" class="tipo-btn" onclick="setEditWho('P')">👤 Pancho</button>
+          <button id="edit-who-S" class="tipo-btn" onclick="setEditWho('S')">👤 Santiago</button>
+        </div>
+      </div>
+
+      <!-- Estado -->
+      <div class="field">
+        <label>Estado</label>
+        <select id="edit-status" class="ntf-select">
+          <option value="URGENTE">🔴 Urgente</option>
+          <option value="EN PROCESO">🔵 En proceso</option>
+          <option value="PENDIENTE">⚪ Pendiente</option>
+          <option value="LISTO">✅ Listo</option>
+        </select>
+      </div>
+
+      <!-- Fecha -->
+      <div class="field">
+        <label>Fecha de realización</label>
+        <input id="edit-date" type="date" style="width:100%;border:1.5px solid #DDE3EC;border-radius:6px;padding:7px 9px;font-size:12px;font-family:inherit;">
+      </div>
+
+      <!-- Monto -->
+      <div class="field">
+        <label>Monto a cobrar (opcional)</label>
+        <input id="edit-amt" type="number" min="0" step="0.01" placeholder="0.00" style="width:100%;border:1.5px solid #DDE3EC;border-radius:6px;padding:7px 9px;font-size:12px;font-family:inherit;">
+      </div>
+
+      <!-- Email contacto -->
+      <div class="field full">
+        <label>Correo del contacto (opcional)</label>
+        <input id="edit-email" type="email" placeholder="contacto@empresa.com" style="width:100%;border:1.5px solid #DDE3EC;border-radius:6px;padding:7px 9px;font-size:12px;font-family:inherit;">
+      </div>
+
+      <!-- Notas / cuerpo correo -->
+      <div class="field full">
+        <label>Notas / cuerpo del correo</label>
+        <textarea id="edit-notas" placeholder="Antecedentes, detalles, acuerdos previos…" style="width:100%;border:1.5px solid #DDE3EC;border-radius:6px;padding:7px 9px;font-size:12px;font-family:inherit;height:100px;resize:vertical;line-height:1.5;"></textarea>
+      </div>
+
+    </div>
+    <div class="ntf-footer">
+      <button class="btn-cancel-new" onclick="closeOvD('ov-edit')">Cancelar</button>
+      <button class="btn-create" onclick="saveEdit()">💾 Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: BRIEFING DEL DÍA ══ -->
+<div class="ov" id="ov-brief" onclick="closeOv('ov-brief',event)">
+  <div class="modal">
+    <div class="mhdr">
+      <div><div class="mtitle" id="brief-title">📋 Tareas para hoy</div><div class="msub" id="brief-sub"></div></div>
+      <button class="bx" onclick="closeOvD('ov-brief')">×</button>
+    </div>
+    <div class="brief-list" id="brief-list"></div>
+    <button class="brief-close" onclick="closeOvD('ov-brief')">Entendido, vamos a trabajar →</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// GOOGLE APPS SCRIPT — INTEGRACIÓN
+// Pega aquí la URL de tu Apps Script después de desplegarlo
+// Ejemplo: 'https://script.google.com/macros/s/AKfycb.../exec'
+// ══════════════════════════════════════════════════
+const APPS_SCRIPT_URL = '';
+
+function notifyScript(action, payload) {
+  if (!APPS_SCRIPT_URL) return; // Sin URL — tablero funciona igual sin conexión
+  try {
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify({ action, ...payload })
+    });
+  } catch(e) { /* silencioso si no hay red */ }
+}
+
+// ══════════════════════════════════════════════════
+// DATOS
+// ══════════════════════════════════════════════════
+const SENDERS = {
+  P:{name:'Francisco Mijares',email:'panchingasm@gmail.com',     label:'Pancho',  bg:'#DBEAFE',color:'#1D4ED8'},
+  S:{name:'Santiago Barcón',  email:'sanbarcon@gmail.com',       label:'Santiago',bg:'#DCFCE7',color:'#15803D'}
+};
+
+// Calendario compartido Barcón & Mijares
+const CALENDAR_URL = 'https://calendar.google.com/calendar/u/0?cid=NjkzMGFhZGM4ZDE0N2NmOWQ0OGRmZTVkNGE4ZjQ2YWRkMjA2NTE0Y2Y2ZTllODUxMzZkMjdiNTAzNzM2N2FhNUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t';
+
+const TASKS=[
+  {id:'t1', title:'SUBURBIA — Respuesta de Bello / Cobrar',       who:'P',amt:315734.46,ds:'URGENTE',   date:'2026-03-09',
+   subj:'Seguimiento de pago — Suburbia',
+   body:'Estimado,\n\nLe escribo para dar seguimiento al saldo pendiente de $315,734.46 (marzo 2026).\n\nAgradecería su confirmación sobre la fecha de liquidación.\n\nSaludos cordiales,'},
+  {id:'t2', title:'APLIR — Cobrar (pago pendiente)',              who:'P',amt:20000.00, ds:'URGENTE',   date:'2026-03-09',
+   subj:'Seguimiento de pago — APLIR',
+   body:'Estimado,\n\nLe contacto para dar seguimiento al pago pendiente de $20,000.00.\n\n¿Podría confirmarme la fecha de transferencia?\n\nSaludos cordiales,'},
+  {id:'t3', title:'TEKKORAMA — Cotización final: enviar',         who:'P',amt:0,        ds:'URGENTE',   date:'2026-03-09',
+   subj:'Cotización — TEKKORAMA',
+   body:'Estimado,\n\nAdjunto la cotización para su revisión y aprobación.\n\nQuedo a su disposición para cualquier ajuste.\n\nSaludos cordiales,'},
+  {id:'t4', title:'JLL — Mediadores: asistencias y solicitudes',  who:'P',amt:0,        ds:'PENDIENTE', date:'2026-03-09',
+   subj:'Seguimiento — JLL Mediadores',
+   body:'Estimado,\n\nLe escribo para dar seguimiento a las asistencias y solicitudes pendientes.\n\nSaludos cordiales,'},
+  {id:'t5', title:'DEGASO — Visita: equipo y murales',            who:'S',amt:0,        ds:'PENDIENTE', date:'2026-03-10',
+   subj:'Confirmación de visita — DEGASO',
+   body:'Estimado,\n\nLe escribo para confirmar la visita y revisar el equipo y murales.\n\nSaludos cordiales,'},
+  {id:'t6', title:'MABE — Taller equipo / coordinar pago',        who:'P',amt:88740.00, ds:'PENDIENTE', date:'2026-03-10',
+   subj:'Coordinación de pago — MABE',
+   body:'Estimado,\n\nLe contacto para coordinar el pago por el taller de equipo ($88,740.00).\n\nSaludos cordiales,'},
+  {id:'t7', title:"CARLOS GRIS — Cobrar DVR's F5 / IRK",         who:'P',amt:77700.00, ds:'PENDIENTE', date:'2026-03-11',
+   subj:"Seguimiento pago — DVR's F5/IRK",
+   body:"Estimado Carlos,\n\nLe escribo para dar seguimiento al cobro de $77,700.00 correspondiente a los DVR's.\n\nSaludos cordiales,"},
+  {id:'t8', title:'CONDUMEX — Entrega y seguimiento',             who:'S',amt:0,        ds:'PENDIENTE', date:'2026-03-11',
+   subj:'Seguimiento entrega — CONDUMEX',
+   body:'Estimado,\n\nLe escribo para dar seguimiento a la entrega y confirmar el estatus.\n\nSaludos cordiales,'},
+  {id:'t9', title:'SIMPER RE — Propuesta final MERES',            who:'S',amt:0,        ds:'PENDIENTE', date:'2026-03-11',
+   subj:'Propuesta final — MERES',
+   body:'Estimado,\n\nAdjunto la propuesta final para MERES.\n\nSaludos cordiales,'},
+  {id:'t10',title:'OPUS — Recibir información del cliente',       who:'S',amt:0,        ds:'PENDIENTE', date:'2026-03-11',
+   subj:'Solicitud información — OPUS',
+   body:'Estimado,\n\nSolicito la información necesaria para avanzar con el proyecto.\n\nSaludos cordiales,'},
+  {id:'t11',title:'WALMART — Seguimiento respuesta Bello',        who:'S',amt:0,        ds:'PENDIENTE', date:'2026-03-12',
+   subj:'Seguimiento — Walmart',
+   body:'Estimado,\n\nLe escribo para dar seguimiento a la respuesta pendiente.\n\nSaludos cordiales,'},
+  {id:'t12',title:'MATEDIC — Cobrar',                             who:'S',amt:17000.00, ds:'PENDIENTE', date:'2026-03-12',
+   subj:'Seguimiento pago — MATEDIC',
+   body:'Estimado,\n\nLe contacto para dar seguimiento al pago de $17,000.00.\n\nSaludos cordiales,'},
+  {id:'t13',title:'EKS — Seguimiento con Pepe Fuentes',           who:'P',amt:0,        ds:'PENDIENTE', date:'2026-03-12',
+   subj:'Seguimiento — EKS',
+   body:'Estimado Pepe,\n\nLe escribo para dar seguimiento a los acuerdos pendientes.\n\nSaludos cordiales,'},
+  {id:'t14',title:'JOE — Definir alcance SIIRM',                 who:'S',amt:0,        ds:'PENDIENTE', date:'2026-03-12',
+   subj:'Definición alcance — SIIRM',
+   body:'Estimado Joe,\n\nLe escribo para coordinar la sesión de definición de alcance SIIRM.\n\nSaludos cordiales,'},
+  {id:'t15',title:'WHLCRE1 — Presupuesto a Carlos Brúiser',       who:'P',amt:0,        ds:'PENDIENTE', date:'2026-03-13',
+   subj:'Presupuesto — WHLCRE1',
+   body:'Estimado Carlos,\n\nAdjunto el presupuesto solicitado.\n\nSaludos cordiales,'},
+];
+
+const NEXT={URGENTE:'EN PROCESO','EN PROCESO':'LISTO',PENDIENTE:'EN PROCESO',LISTO:'PENDIENTE'};
+const ADV ={URGENTE:'→ En proceso','EN PROCESO':'→ Listo ✓',PENDIENTE:'→ En proceso',LISTO:'↩ Reabrir'};
+
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+let ST={},contacts={},dates={},mailMode='gmail',curId=null,openDp=null,dragId=null;
+let hiddenTasks=new Set(), doneAt={};
+
+function load(){
+  try{
+    const _st  =localStorage.getItem('kb2_st');   if(_st)   ST=JSON.parse(_st);
+    const _co  =localStorage.getItem('kb2_co');   if(_co)   contacts=JSON.parse(_co);
+    const _dt  =localStorage.getItem('kb2_dt');   if(_dt)   dates=JSON.parse(_dt);
+    const _mm  =localStorage.getItem('kb2_mm');   if(_mm)   mailMode=_mm;
+    const _hid =localStorage.getItem('kb2_hid');  if(_hid)  hiddenTasks=new Set(JSON.parse(_hid));
+    const _done=localStorage.getItem('kb2_done'); if(_done) doneAt=JSON.parse(_done);
+  }catch(err){}
+  TASKS.forEach(t=>{if(!ST[t.id])ST[t.id]=t.ds;});
+}
+function save(){
+  try{
+    localStorage.setItem('kb2_st',  JSON.stringify(ST));
+    localStorage.setItem('kb2_co',  JSON.stringify(contacts));
+    localStorage.setItem('kb2_dt',  JSON.stringify(dates));
+    localStorage.setItem('kb2_mm',  mailMode);
+    localStorage.setItem('kb2_hid', JSON.stringify(hiddenTasks instanceof Set ? [...hiddenTasks] : []));
+    localStorage.setItem('kb2_done',JSON.stringify(doneAt));
+  }catch(e){}
+}
+function resetAll(){
+  if(!confirm('¿Reiniciar todas las tarjetas?'))return;
+  TASKS.forEach(t=>{ST[t.id]=t.ds;delete dates[t.id];});
+  save();render();
+}
+function setMail(m){ mailMode='gmail'; save(); }
+
+// ══════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════
+const TODAY_ISO=new Date().toISOString().slice(0,10);
+function getDate(t){return dates[t.id]||t.date;}
+function isToday(t){return getDate(t)===TODAY_ISO;}
+function isOverdue(t){return getDate(t)<TODAY_ISO && ST[t.id]!=='LISTO';}
+
+function isEndOfMonth(){
+  const d=new Date();
+  const lastDay=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+  return d.getDate()>=(lastDay-5); // últimos 6 días del mes
+}
+
+function endOfWeekISO(){
+  const d=new Date();
+  // advance to next Sunday (end of current week)
+  const diff=7-d.getDay(); // days until next Sunday (if today is Sun, diff=7 = full week ahead)
+  const sun=new Date(d); sun.setDate(d.getDate()+(d.getDay()===0?0:diff));
+  return sun.toISOString().slice(0,10);
+}
+// Auto-escalate: PENDIENTE tasks whose date falls this week or earlier → move to URGENTE
+function autoEscalate(){
+  const limit=endOfWeekISO();
+  let changed=false;
+  allTasks().forEach(t=>{
+    if(ST[t.id]==='PENDIENTE'){
+      const d=getDate(t);
+      if(d<=limit){ST[t.id]='URGENTE';changed=true;}
+    }
+  });
+  if(changed)save();
+}
+
+function fmtMXN(n){return n.toLocaleString('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:0});}
+function fmtDate(iso){
+  if(!iso)return'Sin fecha';
+  const d=new Date(iso+'T12:00:00');
+  const D=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],M=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return D[d.getDay()]+' '+d.getDate()+' '+M[d.getMonth()];
+}
+function fmtDateFull(iso){
+  if(!iso)return'';
+  const d=new Date(iso+'T12:00:00');
+  const D=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'],M=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  return D[d.getDay()]+' '+d.getDate()+' de '+M[d.getMonth()]+' de '+d.getFullYear();
+}
+
+// ══════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════
+function render(){
+  autoEscalate();
+  ['URGENTE','EN PROCESO','PENDIENTE','LISTO'].forEach(s=>document.getElementById('cards-'+s).innerHTML='');
+  let cob=0,listo=0;
+
+  allTasks().forEach(task=>{
+    const st=ST[task.id];
+    const cont=document.getElementById('cards-'+st);
+    if(!cont)return;
+    if(task.amt&&st!=='LISTO')cob+=task.amt;
+    if(st==='LISTO')listo++;
+
+    const today=isToday(task)&&st!=='LISTO';
+    const overdue=isOverdue(task);
+    const d=getDate(task);
+
+    const div=document.createElement('div');
+    div.className='card'+(today?' is-today':overdue?' is-overdue':'');
+    div.setAttribute('draggable','true');
+    div.setAttribute('data-id',task.id);
+    div.addEventListener('dragstart',e=>{dragId=task.id;e.dataTransfer.setData('text/plain',task.id);setTimeout(()=>div.classList.add('dragging'),0);});
+    div.addEventListener('dragend', ()=>{div.classList.remove('dragging');dragId=null;});
+    // Tooltip on hover
+    div.addEventListener('mouseenter',e=>{if(!div.classList.contains('dragging'))showTT(task,e);});
+    div.addEventListener('mousemove', e=>{posTT(e);});
+    div.addEventListener('mouseleave',()=>{hideTT();});
+
+    const tagHtml=today?'<span class="tag tag-hoy">📅 HOY</span>':overdue?'<span class="tag tag-venc">⚠️ VENCIDA</span>':'';
+    const amtHtml=task.amt?`<span class="card-amt${isEndOfMonth()?' eom':''}">${fmtMXN(task.amt)}</span>`:'';
+
+    // Sí/No bar for today + overdue
+    const ynBar=(today||overdue)?`
+      <div class="yn-bar">
+        <span class="yn-lbl">¿Terminaste?</span>
+        <button class="yn-si" onclick="quickSi('${task.id}',event)">✅ Sí</button>
+        <button class="yn-no" onclick="quickNo('${task.id}',event)">❌ No</button>
+      </div>`:'' ;
+
+    div.innerHTML=`
+      <div class="card-row1">
+        <div class="card-title">${task.title}</div>
+        <button class="card-edit-btn" onclick="openEdit('${task.id}',event)" title="Editar tarea">✏️</button>
+        <div class="card-badges"><span class="bdg bdg-${task.who}">${task.who}</span>${tagHtml}</div>
+      </div>
+      <div class="card-row2">
+        <div class="dpop-wrap">
+          <button class="date-btn" onclick="toggleDp('${task.id}',this,event)">📅 ${fmtDate(d)}</button>
+          <div class="dpop" id="dp-${task.id}">
+            <input type="date" id="dpi-${task.id}" value="${d}">
+            <div class="dpop-acts">
+              <button class="dpop-ok"     onclick="saveDate('${task.id}',event)">OK</button>
+              <button class="dpop-cancel" onclick="closeDp(event)">✕</button>
+            </div>
+          </div>
+        </div>
+        ${amtHtml}
+      </div>
+      <div class="card-acts">
+        <button class="ba ba-adv"  onclick="advance('${task.id}',event)">${ADV[st]}</button>
+        <button class="ba ba-mail" onclick="openMail('${task.id}',event)" title="Correo">📧</button>
+        <button class="ba ba-cal"  onclick="openCalOv('${task.id}',event)" title="Calendario">📅</button>
+        <button class="ba ba-wa"   onclick="doWA('${task.id}',event)" title="WhatsApp">💬</button>
+      </div>
+      ${ynBar}
+      <div style="text-align:right;margin-top:3px;"><button onclick="deleteTask('${task.id}',event)" style="background:none;border:none;font-size:10px;color:#CCC;cursor:pointer;padding:0;transition:color .13s;" onmouseover="this.style.color='#C62828'" onmouseout="this.style.color='#CCC'" title="Eliminar tarea">🗑 eliminar</button></div>
+    `;
+    cont.appendChild(div);
+  });
+
+  ['URGENTE','EN PROCESO','PENDIENTE','LISTO'].forEach(s=>{
+    const c=document.getElementById('cards-'+s);
+    document.getElementById('cnt-'+s).textContent=c.children.length;
+    if(!c.children.length)c.innerHTML='<div class="empty">Arrastra tarjetas aquí</div>';
+  });
+
+  const total=allTasks().length;
+  document.getElementById('v-listo').textContent=listo+' / '+total;
+  document.getElementById('v-cob').textContent=fmtMXN(cob);
+  const pct=total?Math.round(listo/total*100):0;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-lbl').textContent=listo+' de '+total+' completadas ('+pct+'%)';
+
+  renderBanner();
+}
+
+function renderBanner(){
+  const hoy=allTasks().filter(t=>isToday(t)&&ST[t.id]!=='LISTO');
+  const venc=allTasks().filter(t=>isOverdue(t));
+  const b=document.getElementById('today-banner');
+  if(!hoy.length&&!venc.length){b.style.display='none';return;}
+  let html='';
+  if(hoy.length) html+=`<strong>📅 HOY tienes ${hoy.length} tarea${hoy.length>1?'s':''}: </strong>`;
+  if(venc.length) html+=(hoy.length?' · ':'')+`<strong>⚠️ ${venc.length} vencida${venc.length>1?'s':''}: </strong>`;
+  html+='<div class="banner-tasks">';
+  [...hoy,...venc].forEach(t=>html+=`<span class="banner-chip">${t.title.split('—')[0].trim()}</span>`);
+  html+='</div>';
+  b.innerHTML=html;b.style.display='block';
+}
+
+function advance(id,e){
+  e&&e.stopPropagation();
+  const next=NEXT[ST[id]];
+  if(next==='LISTO') markListo(id); else {ST[id]=next;save();}
+  render();
+  const task=allTasks().find(t=>t.id===id);
+  if(task) notifyScript('updateStatus',{id,status:ST[id]});
+}
+
+// ══════════════════════════════════════════════════
+// DATE POPOVER
+// ══════════════════════════════════════════════════
+function toggleDp(id,btn,e){
+  e.stopPropagation();hideTT();
+  const dp=document.getElementById('dp-'+id);
+  if(!dp)return;
+  const wasOpen=dp.classList.contains('open');
+  closeAllDp();
+  if(!wasOpen){
+    // position the popover below the button using fixed coords
+    const rect=btn.getBoundingClientRect();
+    dp.style.top=(rect.bottom+6)+'px';
+    // keep within viewport horizontally
+    const left=Math.min(rect.left, window.innerWidth-200);
+    dp.style.left=Math.max(left,6)+'px';
+    dp.classList.add('open');
+    openDp=id;
+  }
+}
+function closeAllDp(){
+  document.querySelectorAll('.dpop.open').forEach(d=>d.classList.remove('open'));
+  openDp=null;
+}
+function closeDp(e){e.stopPropagation();closeAllDp();}
+
+function saveDate(id,e){
+  e.stopPropagation();
+  const val=document.getElementById('dpi-'+id).value;
+  if(!val)return;
+  dates[id]=val;save();
+  closeAllDp();
+  render();
+  curId=id;
+  // Notifica al Apps Script con la nueva fecha
+  const task=allTasks().find(t=>t.id===id);
+  if(task) notifyScript('setReminder',{id:task.id,title:task.title,who:task.who,date:val,amt:task.amt||0,status:ST[id]||task.ds});
+  setTimeout(()=>showRemModal(id),150);
+}
+// Close date picker when clicking outside — but only if click is NOT inside a .dpop
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.dpop')&&!e.target.closest('.date-btn')) closeAllDp();
+});
+
+// ══════════════════════════════════════════════════
+// REMINDER MODAL (se abre al guardar fecha)
+// ══════════════════════════════════════════════════
+function showRemModal(id){
+  const task=allTasks().find(t=>t.id===id);
+  const sender=SENDERS[task.who];
+  const d=getDate(task);
+  document.getElementById('rem-sub').textContent=task.title;
+  document.getElementById('rem-info').innerHTML=
+    `<strong>${task.title}</strong><br>`+
+    `📅 ${fmtDateFull(d)}<br>`+
+    `👤 ${sender.label}`+(task.amt?`<br>💰 ${fmtMXN(task.amt)}`:'');
+  document.getElementById('ov-rem').classList.add('open');
+}
+
+function remAction(type){
+  closeOvD('ov-rem');
+  if(type==='cal') openCalOvFor(curId);
+  if(type==='wa')  doWA(curId,null);
+  if(type==='mail'){openMail(curId,null);buildReminderMail(curId);}
+}
+
+function remAll(){
+  closeOvD('ov-rem');
+  // 1. ICS download (silent)
+  doCalIcs(curId);
+  // 2. WhatsApp
+  setTimeout(()=>doWA(curId,null),400);
+  // 3. Email
+  setTimeout(()=>{openMail(curId,null);buildReminderMail(curId);},800);
+}
+
+function buildReminderMail(id){
+  const task=allTasks().find(t=>t.id===id);
+  const sender=SENDERS[task.who];
+  const d=getDate(task);
+  const subj=`⏰ [RECORDATORIO] ${task.title} | ${fmtDate(d)}`;
+  const body=
+`Hola ${sender.label},
+
+Este es tu recordatorio para el día ${fmtDateFull(d)}:
+
+📋 Tarea: ${task.title}
+📅 Fecha: ${fmtDateFull(d)}
+👤 Responsable: ${sender.label}
+${task.amt?'💰 Monto: '+fmtMXN(task.amt)+'\n':''}
+── ── ──
+¿Completaste esta tarea?
+
+  ✅ SÍ → Abre el tablero y arrástrala a la columna LISTO
+  ❌ NO → Abre el tablero, haz clic en la fecha y elige una nueva fecha (se activarán los recordatorios automáticamente)
+
+Tablero: Kanban_Barcon_Mijares.html
+
+${sender.name}
+${sender.email}`;
+  document.getElementById('mail-subj').value=subj;
+  document.getElementById('mail-body').value=body;
+}
+
+// ══════════════════════════════════════════════════
+// SÍ / NO
+// ══════════════════════════════════════════════════
+function quickSi(id,e){e&&e.stopPropagation();curId=id;ynSi();}
+function quickNo(id,e){e&&e.stopPropagation();curId=id;openYN();}
+
+function openYN(){
+  const task=allTasks().find(t=>t.id===curId);
+  const d=getDate(task);
+  document.getElementById('yn-title').textContent='¿Terminaste la tarea?';
+  document.getElementById('yn-sub').textContent=task.title;
+  document.getElementById('yn-msg').innerHTML=
+    `<strong>${task.title}</strong><br>📅 ${fmtDateFull(d)}`+
+    (task.amt?`<br>💰 ${fmtMXN(task.amt)}`:'');
+  document.getElementById('reschedule-area').style.display='none';
+  document.getElementById('new-date-input').value='';
+  document.getElementById('ov-yn').classList.add('open');
+}
+
+function ynSi(){
+  markListo(curId);
+  closeOvD('ov-yn');render();
+}
+function ynDelete(){
+  if(!confirm('¿Eliminar esta tarea del tablero? Esta acción no se puede deshacer.')) return;
+  closeOvD('ov-yn');
+  const id=curId;
+  hiddenTasks.add(id);
+  customTasks=customTasks.filter(t=>t.id!==id);
+  delete ST[id]; delete dates[id]; delete contacts[id]; delete doneAt[id];
+  saveCustom(); save(); render();
+  if(document.getElementById('cal-view').classList.contains('active')) renderCalendar();
+}
+function showReschedule(){
+  document.getElementById('reschedule-area').style.display='block';
+  document.getElementById('new-date-input').focus();
+}
+function doReschedule(){
+  const val=document.getElementById('new-date-input').value;
+  if(!val){alert('Selecciona una nueva fecha');return;}
+  dates[curId]=val;save();
+  closeOvD('ov-yn');render();
+  setTimeout(()=>showRemModal(curId),200);
+}
+
+// ══════════════════════════════════════════════════
+// EMAIL
+// ══════════════════════════════════════════════════
+function openMail(id,e){
+  if(e)e.stopPropagation();
+  closeAllDp();
+  const task=allTasks().find(t=>t.id===id);
+  const sender=SENDERS[task.who];
+  curId=id;
+  document.getElementById('mail-title').textContent='📧 '+task.title;
+  document.getElementById('mail-sub').textContent='De: '+sender.label+' ('+sender.email+')';
+  const fb=document.getElementById('mail-fbdg');
+  fb.textContent=sender.label;fb.style.background=sender.bg;fb.style.color=sender.color;
+  document.getElementById('mail-from').value=sender.email;
+  document.getElementById('mail-to').value=contacts[id]||'';
+  document.getElementById('mail-subj').value=task.subj;
+  document.getElementById('mail-body').value=task.body+'\n\n'+sender.name+'\n'+sender.email;
+  document.getElementById('ov-mail').classList.add('open');
+  document.getElementById('mail-to').focus();
+}
+function sendMail(mode){
+  const to=document.getElementById('mail-to').value.trim();
+  const subj=document.getElementById('mail-subj').value;
+  const body=document.getElementById('mail-body').value;
+  const from=document.getElementById('mail-from').value;
+  if(curId&&to){contacts[curId]=to;save();}
+  const es=encodeURIComponent(subj),eb=encodeURIComponent(body),et=encodeURIComponent(to);
+  let url;
+  if(mode==='gmail')    url=`https://mail.google.com/mail/?view=cm&fs=1&authuser=${encodeURIComponent(from)}&to=${et}&su=${es}&body=${eb}`;
+  else if(mode==='outlook') url=`https://outlook.office.com/mail/deeplink/compose?to=${et}&subject=${es}&body=${eb}`;
+  else url=`mailto:${to}?subject=${es}&body=${eb}`;
+  window.open(url,'_blank');
+}
+
+// ══════════════════════════════════════════════════
+// CALENDARIO
+// ══════════════════════════════════════════════════
+function openCalOv(id,e){if(e)e.stopPropagation();curId=id;const task=allTasks().find(t=>t.id===id);document.getElementById('cal-title').textContent='📅 Agregar al calendario';document.getElementById('cal-sub').textContent=task.title+' · '+fmtDate(getDate(task));document.getElementById('ov-cal').classList.add('open');}
+function openCalOvFor(id){curId=id;openCalOv(id,null);}
+
+function calPayload(id){
+  const task=allTasks().find(t=>t.id===id);
+  const sender=SENDERS[task.who];
+  const d=getDate(task);
+  const dt=d.replace(/-/g,'');
+  const title=task.title+(task.amt?' — '+fmtMXN(task.amt):'');
+  const det='Responsable: '+sender.name+' ('+sender.email+')'+(task.amt?'\nMonto: '+fmtMXN(task.amt):'')
+    +'\n\n¿Terminaste?\n✅ Sí → abre el tablero y arrástrala a LISTO\n❌ No → clic en la fecha para reagendar';
+  return{task,d,dt,start:dt+'T090000',end:dt+'T093000',title,det};
+}
+function doCal(type){
+  const{task,d,dt,start,end,title,det}=calPayload(curId);
+  if(type==='shared'){
+    // Abre el calendario compartido Barcón & Mijares directamente
+    window.open(CALENDAR_URL,'_blank');
+  }else if(type==='google'){
+    window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(det)}&add=${encodeURIComponent(SENDERS.P.email)}&add=${encodeURIComponent(SENDERS.S.email)}`,'_blank');
+  }else if(type==='outlook'){
+    window.open(`https://outlook.office.com/calendar/deeplink/compose?subject=${encodeURIComponent(title)}&startdt=${d}T09:00:00&enddt=${d}T09:30:00&body=${encodeURIComponent(det)}`,'_blank');
+  }else{
+    doCalIcs(curId);
+  }
+  closeOvD('ov-cal');
+}
+function doCalIcs(id){
+  const{task,d,dt,start,end,title,det}=calPayload(id||curId);
+  const now=new Date().toISOString().replace(/[-:.]/g,'').slice(0,15)+'Z';
+  const ics=
+`BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BM-Tracker//ES\r\nBEGIN:VEVENT\r\n`+
+`UID:${task.id}-${now}@bm\r\nDTSTAMP:${now}\r\n`+
+`DTSTART;TZID=America/Mexico_City:${start}\r\n`+
+`DTEND;TZID=America/Mexico_City:${end}\r\n`+
+`SUMMARY:${title}\r\n`+
+`DESCRIPTION:${det.replace(/\n/g,'\\n')}\r\n`+
+`BEGIN:VALARM\r\nTRIGGER:-PT30M\r\nACTION:DISPLAY\r\nDESCRIPTION:⏰ ${task.title}\r\nEND:VALARM\r\n`+
+`END:VEVENT\r\nEND:VCALENDAR`;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));
+  a.download=task.id+'_recordatorio.ics';a.click();
+}
+
+// ══════════════════════════════════════════════════
+// WHATSAPP
+// ══════════════════════════════════════════════════
+function doWA(id,e){
+  if(e)e.stopPropagation();
+  const task=allTasks().find(t=>t.id===id);
+  const sender=SENDERS[task.who];
+  const d=getDate(task);
+  const msg=
+`⏰ *RECORDATORIO DE PENDIENTE*
+
+📋 *${task.title}*
+📅 ${fmtDateFull(d)}
+👤 ${sender.label} (${sender.email})`+
+(task.amt?`\n💰 *${fmtMXN(task.amt)}*`:'')+
+`
+
+*¿Terminaste?*
+✅ Sí → Abre el tablero · arrástrala a LISTO
+❌ No → Abre el tablero · clic en la fecha para reagendar
+_(se activarán los recordatorios con la nueva fecha)_
+
+_Tablero Barcón & Mijares_`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ══════════════════════════════════════════════════
+// DRAG & DROP
+// ══════════════════════════════════════════════════
+function dov(e,col){e.preventDefault();e.dataTransfer.dropEffect='move';col.classList.add('drag-over');}
+function dlv(col){col.classList.remove('drag-over');}
+function drp(e,status){
+  e.preventDefault();e.currentTarget.classList.remove('drag-over');
+  const id=e.dataTransfer.getData('text/plain')||dragId;
+  if(id&&ST[id]!==status){
+    if(status==='LISTO') markListo(id); else {ST[id]=status;save();}
+    render();
+    notifyScript('updateStatus',{id,status});
+  }
+}
+
+// ══════════════════════════════════════════════════
+// OVERLAYS
+// ══════════════════════════════════════════════════
+function closeOv(id,e){if(e.target===document.getElementById(id))closeOvD(id);}
+function closeOvD(id){
+  if(id==='ov-mail'){const to=document.getElementById('mail-to').value.trim();if(curId&&to){contacts[curId]=to;save();}}
+  document.getElementById(id).classList.remove('open');
+}
+
+// ══════════════════════════════════════════════════
+// BRIEFING AL ABRIR
+// ══════════════════════════════════════════════════
+function checkBriefing(){
+  const hoy =allTasks().filter(t=>isToday(t)&&ST[t.id]!=='LISTO');
+  const venc=allTasks().filter(t=>isOverdue(t));
+  if(!hoy.length&&!venc.length)return;
+  buildBriefList(hoy,venc);
+  document.getElementById('ov-brief').classList.add('open');
+}
+
+function buildBriefList(hoy,venc){
+  hoy  = hoy  || allTasks().filter(t=>isToday(t)&&ST[t.id]!=='LISTO');
+  venc = venc || allTasks().filter(t=>isOverdue(t));
+  const total=hoy.length+venc.length;
+  document.getElementById('brief-title').textContent='📋 Revisión del día — '+fmtDateFull(TODAY_ISO);
+  document.getElementById('brief-sub').textContent=total+' tarea'+(total>1?'s':'')+' requieren tu atención hoy';
+  const list=document.getElementById('brief-list');
+  list.innerHTML='';
+  if(!total){
+    list.innerHTML='<div style="text-align:center;padding:20px;color:#888;font-size:13px;">✅ ¡Todo al día! Sin pendientes urgentes.</div>';
+    return;
+  }
+  [...venc,...hoy].forEach(t=>{
+    const ov  = isOverdue(t);
+    const d   = getDate(t);
+    const s   = SENDERS[t.who]||{label:t.who};
+    const stL = {'URGENTE':'🔴 Urgente','EN PROCESO':'🔵 En proceso','PENDIENTE':'⚪ Pendiente','LISTO':'✅ Listo'};
+    const li  = document.createElement('div');
+    li.className='brief-item '+(ov?'overdue':'today');
+
+    // Meta: fecha + monto + estado
+    let metaHtml=`<span class="brief-meta-pill">📅 ${fmtDate(d)}</span>`;
+    metaHtml+=`<span class="brief-meta-pill">${stL[ST[t.id]]||ST[t.id]}</span>`;
+    if(t.amt>0) metaHtml+=`<span class="brief-meta-amt">${fmtMXN(t.amt)}</span>`;
+
+    li.innerHTML=
+      `<div class="brief-item-hdr">`+
+        `<span class="brief-tag ${ov?'ov':'td'}">${ov?'⚠️ VENCIDA':'📅 HOY'}</span>`+
+        `<span class="brief-item-title">${t.title}</span>`+
+        `<span class="brief-item-who">${s.label}</span>`+
+      `</div>`+
+      `<div class="brief-item-meta">${metaHtml}</div>`+
+      `<div class="brief-item-acts">`+
+        `<button class="brief-act brief-act-done"  onclick="briefDone('${t.id}')">✅ Listo</button>`+
+        `<button class="brief-act brief-act-sched" onclick="briefReschedule('${t.id}')">📅 Nueva fecha</button>`+
+        `<button class="brief-act brief-act-edit"  onclick="briefEdit('${t.id}')">✏️ Ver / editar</button>`+
+      `</div>`;
+    list.appendChild(li);
+  });
+}
+
+function briefDone(id){
+  markListo(id);render();
+  notifyScript('updateStatus',{id,status:'LISTO'});
+  buildBriefList();
+}
+
+function briefReschedule(id){
+  closeOvD('ov-brief');
+  curId=id;
+  // Abre modal Sí/No para reagendar
+  openYN();
+}
+
+function briefEdit(id){
+  closeOvD('ov-brief');
+  openEdit(id, new Event('click'));
+}
+
+function reopenBriefing(){
+  buildBriefList();
+  document.getElementById('ov-brief').classList.add('open');
+}
+
+// ══════════════════════════════════════════════════
+// NUEVA TAREA
+// ══════════════════════════════════════════════════
+let customTasks=[];
+
+function loadCustom(){
+  try{const c=localStorage.getItem('kb2_custom');if(c)customTasks=JSON.parse(c);}catch(e){}
+  // restore status + dates for custom tasks
+  customTasks.forEach(t=>{if(!ST[t.id])ST[t.id]=t.ds;});
+}
+function saveCustom(){
+  try{localStorage.setItem('kb2_custom',JSON.stringify(customTasks));}catch(e){}
+}
+
+function allTasks(){return[...TASKS,...customTasks].filter(t=>!hiddenTasks.has(t.id));}
+
+// Marca LISTO y registra la fecha de completado
+function markListo(id){
+  ST[id]='LISTO';
+  if(!doneAt[id]) doneAt[id]=TODAY_ISO;
+  save();
+}
+
+// Auto-oculta tareas LISTO con más de 5 días de completadas
+function autoExpire(){
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-5);
+  const cutoffISO=cutoff.toISOString().slice(0,10);
+  let changed=false;
+  Object.keys(doneAt).forEach(id=>{
+    if(doneAt[id]<=cutoffISO&&!hiddenTasks.has(id)){
+      hiddenTasks.add(id);
+      customTasks=customTasks.filter(t=>t.id!==id);
+      changed=true;
+    }
+  });
+  if(changed){saveCustom();save();}
+}
+
+function openNewTask(){
+  // reset form
+  document.getElementById('nt-empresa').value='';
+  document.getElementById('nt-desc').value='';
+  document.getElementById('nt-who').value='P';
+  selectWho('P');
+  document.getElementById('nt-status').value='PENDIENTE';
+  document.getElementById('nt-date').value=TODAY_ISO;
+  document.getElementById('nt-amt').value='';
+  document.getElementById('nt-email').value='';
+  document.getElementById('nt-notas').value='';
+  document.getElementById('ov-new').classList.add('open');
+  setTimeout(()=>document.getElementById('nt-empresa').focus(),100);
+}
+
+function selectWho(who){
+  document.getElementById('nt-who').value=who;
+  document.getElementById('nt-p-btn').classList.toggle('sel',who==='P');
+  document.getElementById('nt-s-btn').classList.toggle('sel',who==='S');
+}
+
+function saveNewTask(){
+  const empresa=document.getElementById('nt-empresa').value.trim();
+  const desc   =document.getElementById('nt-desc').value.trim();
+  const who    =document.getElementById('nt-who').value;
+  const status =document.getElementById('nt-status').value;
+  const date   =document.getElementById('nt-date').value;
+  const amtRaw =parseFloat(document.getElementById('nt-amt').value)||0;
+  const email  =document.getElementById('nt-email').value.trim();
+  const notas  =document.getElementById('nt-notas').value.trim();
+
+  if(!empresa){alert('Escribe el nombre de la empresa o cliente.');document.getElementById('nt-empresa').focus();return;}
+  if(!desc)   {alert('Escribe la descripción o acción a realizar.');document.getElementById('nt-desc').focus();return;}
+  if(!date)   {alert('Selecciona la fecha de realización.');document.getElementById('nt-date').focus();return;}
+
+  const sender=SENDERS[who];
+  const id='ct'+Date.now();
+  const title=empresa.toUpperCase()+' — '+desc;
+  const subj ='Seguimiento — '+empresa;
+  const bodyLines=[
+    'Estimado,',
+    '',
+    'Le escribo con relación a: '+desc+'.',
+    notas?'\n'+notas:'',
+    '',
+    'Quedo a su disposición para cualquier aclaración.',
+    '',
+    'Saludos cordiales,'
+  ].join('\n');
+
+  const task={id,title,who,amt:amtRaw,ds:status,date,subj,body:bodyLines,custom:true};
+  customTasks.push(task);
+  ST[id]=status;
+  if(email) contacts[id]=email;
+  saveCustom();save();
+
+  // Notifica al Apps Script
+  notifyScript('setReminder',{id,title,who,date,amt:amtRaw,status});
+
+  closeOvD('ov-new');
+  render();
+
+  // auto-trigger reminder
+  curId=id;
+  setTimeout(()=>showRemModal(id),250);
+}
+
+function deleteTask(id,e){
+  if(e){e.stopPropagation();e.preventDefault();}
+  hideTT();
+  // Animación de salida antes de confirmar para dar feedback inmediato
+  const card=document.querySelector(`[data-id="${id}"]`);
+  if(card) card.style.opacity='0.35';
+  if(!confirm('¿Eliminar esta tarea del tablero?')){
+    if(card) card.style.opacity='';
+    return;
+  }
+  hiddenTasks.add(id);
+  customTasks=customTasks.filter(t=>t.id!==id);
+  delete ST[id];delete dates[id];delete contacts[id];delete doneAt[id];
+  saveCustom();save();
+  render();
+  // Si la pestaña de calendario está activa, refrescarla también
+  if(document.getElementById('cal-view').classList.contains('active')) renderCalendar();
+}
+
+// ══════════════════════════════════════════════════
+// TOOLTIP
+// ══════════════════════════════════════════════════
+let ttEl=null;
+function initTooltip(){
+  ttEl=document.createElement('div');
+  ttEl.id='global-tt';
+  document.body.appendChild(ttEl);
+}
+
+function showTT(task,e){
+  if(!ttEl)return;
+  const st=ST[task.id];
+  const d=getDate(task);
+  const s=SENDERS[task.who]||{label:task.who};
+  const stLabel={'URGENTE':'🔴 Urgente','EN PROCESO':'🔵 En proceso','PENDIENTE':'⚪ Pendiente','LISTO':'✅ Listo'};
+  let html=`<div class="tt-title">${task.title}</div>`;
+  html+=`<div class="tt-row"><span class="tt-lbl">Responsable</span><span class="tt-val">${s.label}</span></div>`;
+  html+=`<div class="tt-row"><span class="tt-lbl">Estado</span><span class="tt-val">${stLabel[st]||st}</span></div>`;
+  html+=`<div class="tt-row"><span class="tt-lbl">Fecha</span><span class="tt-val">${fmtDate(d)}</span></div>`;
+  if(task.amt)html+=`<div class="tt-row"><span class="tt-lbl">Monto</span><span class="tt-val">${fmtMXN(task.amt)}</span></div>`;
+  if(task.email||contacts[task.id])html+=`<div class="tt-row"><span class="tt-lbl">Correo</span><span class="tt-val">${task.email||contacts[task.id]}</span></div>`;
+  const notas=task.notas||'';
+  if(notas)html+=`<div class="tt-notes">${notas.slice(0,120)}${notas.length>120?'…':''}</div>`;
+  html+=`<div class="tt-hint">✏️ clic para editar</div>`;
+  ttEl.innerHTML=html;
+  ttEl.classList.add('show');
+  posTT(e);
+}
+
+function posTT(e){
+  if(!ttEl||!ttEl.classList.contains('show'))return;
+  const x=e.clientX+16, y=e.clientY-10;
+  const maxX=window.innerWidth-300, maxY=window.innerHeight-220;
+  ttEl.style.left=Math.min(x,Math.max(maxX,10))+'px';
+  ttEl.style.top=Math.max(6,Math.min(y,maxY))+'px';
+}
+
+function hideTT(){if(ttEl)ttEl.classList.remove('show');}
+
+// ══════════════════════════════════════════════════
+// EDITAR TAREA
+// ══════════════════════════════════════════════════
+let editWho='P';
+
+function openEdit(id,e){
+  e&&e.stopPropagation();
+  hideTT();
+  const task=allTasks().find(t=>t.id===id);
+  if(!task)return;
+  document.getElementById('edit-id').value=id;
+  document.getElementById('edit-title').value=task.title||'';
+  document.getElementById('edit-date').value=getDate(task);
+  document.getElementById('edit-amt').value=task.amt||'';
+  document.getElementById('edit-email').value=task.email||contacts[task.id]||'';
+  document.getElementById('edit-notas').value=task.notas||task.body||'';
+  document.getElementById('edit-status').value=ST[task.id]||task.ds||'PENDIENTE';
+  setEditWho(task.who||'P');
+  document.getElementById('edit-sub').textContent=task.title;
+  document.getElementById('ov-edit').classList.add('open');
+}
+
+function setEditWho(w){
+  editWho=w;
+  ['P','S'].forEach(k=>{
+    const b=document.getElementById('edit-who-'+k);
+    if(b)b.classList.toggle('sel',k===w);
+  });
+}
+
+function saveEdit(){
+  const id=document.getElementById('edit-id').value;
+  const task=allTasks().find(t=>t.id===id);
+  if(!task)return;
+  const newTitle=document.getElementById('edit-title').value.trim();
+  if(newTitle)task.title=newTitle;
+  task.who=editWho;
+  const newAmt=parseFloat(document.getElementById('edit-amt').value);
+  task.amt=isNaN(newAmt)?0:newAmt;
+  const newEmail=document.getElementById('edit-email').value.trim();
+  if(newEmail){task.email=newEmail;contacts[id]=newEmail;}
+  const newNotas=document.getElementById('edit-notas').value.trim();
+  task.notas=newNotas;task.body=newNotas;
+  const newSt=document.getElementById('edit-status').value;
+  if(newSt==='LISTO') markListo(id); else ST[id]=newSt;
+  const newDate=document.getElementById('edit-date').value;
+  if(newDate)dates[id]=newDate;
+  // persist custom tasks
+  if(task.custom){
+    const idx=customTasks.findIndex(t=>t.id===id);
+    if(idx>=0)customTasks[idx]=task;
+    saveCustom();
+  }
+  save();render();
+  // Sincroniza cambios con Apps Script
+  notifyScript('setReminder',{id:task.id,title:task.title,who:task.who,date:dates[id]||task.date,amt:task.amt||0,status:ST[id]});
+  closeOvD('ov-edit');
+}
+
+// ══════════════════════════════════════════════════
+// HASH (deep links desde correos/WA)
+// ══════════════════════════════════════════════════
+function handleHash(){
+  const h=window.location.hash;
+  if(h.startsWith('#done-')){
+    const id=h.slice(6);if(allTasks().find(t=>t.id===id)){markListo(id);render();window.location.hash='';alert('✅ Tarea marcada como completada.');}
+  }else if(h.startsWith('#reagenda-')){
+    const id=h.slice(10);if(allTasks().find(t=>t.id===id)){curId=id;render();setTimeout(()=>openYN(),300);window.location.hash='';}
+  }
+}
+
+// ══════════════════════════════════════════════════
+// TABS & CALENDAR VIEW
+// ══════════════════════════════════════════════════
+let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
+const MONTHS_ES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const ST_CODE={'URGENTE':'U','EN PROCESO':'E','PENDIENTE':'P','LISTO':'L'};
+
+function switchTab(tab){
+  const isBoard=(tab==='board');
+  document.getElementById('board-view').classList.toggle('hidden',!isBoard);
+  document.getElementById('cal-view').classList.toggle('active',!isBoard);
+  document.getElementById('tab-board').classList.toggle('active',isBoard);
+  document.getElementById('tab-calendar').classList.toggle('active',!isBoard);
+  if(!isBoard) renderCalendar();
+}
+
+function calPrev(){ calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function calNext(){ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
+function calGoToday(){ calYear=new Date().getFullYear(); calMonth=new Date().getMonth(); renderCalendar(); }
+
+function renderCalendar(){
+  const today=new Date(); const tyear=today.getFullYear(),tmonth=today.getMonth(),tday=today.getDate();
+  document.getElementById('cal-month-label').textContent=MONTHS_ES[calMonth]+' '+calYear;
+
+  // Resumen global
+  const counts={U:0,E:0,P:0,L:0};
+  allTasks().forEach(t=>{ const c=ST_CODE[ST[t.id]]; if(c) counts[c]++; });
+  ['U','E','P','L'].forEach(c=>{ const el=document.getElementById('cs-'+c); if(el) el.textContent=counts[c]; });
+
+  // Construye mapa fecha→tareas
+  const byDate={};
+  allTasks().forEach(t=>{
+    const d=getDate(t); if(!d) return;
+    if(!byDate[d]) byDate[d]=[];
+    byDate[d].push(t);
+  });
+
+  // Calcula días del mes
+  const firstDay=new Date(calYear,calMonth,1);
+  let startDow=firstDay.getDay(); // 0=dom
+  startDow=(startDow===0)?6:startDow-1; // convierte a lunes=0
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const daysInPrev=new Date(calYear,calMonth,0).getDate();
+
+  // Grid: 7 col * N filas — reemplaza el contenedor
+  const grid=document.getElementById('cal-grid');
+  // Regenera el grid limpiando días previos (mantiene las 7 cabeceras)
+  // El grid tiene los 7 headers + un div#cal-days, pero en realidad queremos un grid plano
+  // Vamos a reemplazar todo el grid incluyendo headers
+  let html='<div class="cal-dh">Lun</div><div class="cal-dh">Mar</div><div class="cal-dh">Mié</div><div class="cal-dh">Jue</div><div class="cal-dh">Vie</div><div class="cal-dh">Sáb</div><div class="cal-dh">Dom</div>';
+
+  // Celdas del mes anterior (relleno)
+  for(let i=0;i<startDow;i++){
+    const d=daysInPrev-startDow+i+1;
+    html+=`<div class="cal-day other-month"><div class="cal-dn">${d}</div></div>`;
+  }
+
+  // Días del mes actual
+  for(let d=1;d<=daysInMonth;d++){
+    const mm=String(calMonth+1).padStart(2,'0'),dd=String(d).padStart(2,'0');
+    const iso=`${calYear}-${mm}-${dd}`;
+    const isToday2=(calYear===tyear&&calMonth===tmonth&&d===tday);
+    const tasks=byDate[iso]||[];
+    const hasOverdue=tasks.some(t=>ST[t.id]!=='LISTO'&&iso<TODAY_ISO);
+
+    let cls='cal-day';
+    if(isToday2) cls+=' is-today';
+    else if(hasOverdue) cls+=' has-overdue';
+
+    const dnHtml=isToday2
+      ?`<div class="cal-dn" style="width:18px;height:18px;background:#FF8F00;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;margin-left:auto;margin-bottom:4px;">${d}</div>`
+      :`<div class="cal-dn">${d}</div>`;
+
+    let pillsHtml='';
+    const maxShow=3;
+    tasks.slice(0,maxShow).forEach(t=>{
+      const stC=ST_CODE[ST[t.id]]||'P';
+      const short=t.title.split('—')[0].trim().slice(0,22);
+      pillsHtml+=`<span class="cal-pill cp-${stC}" onclick="openEdit('${t.id}',event)" title="${t.title}">${short}</span>`;
+    });
+    if(tasks.length>maxShow) pillsHtml+=`<div class="cal-more" onclick="calShowDay('${iso}')">+${tasks.length-maxShow} más</div>`;
+
+    html+=`<div class="${cls}" data-date="${iso}">${dnHtml}${pillsHtml}</div>`;
+  }
+
+  // Relleno al final para completar la última semana
+  const totalCells=startDow+daysInMonth;
+  const rem=totalCells%7===0?0:7-(totalCells%7);
+  for(let i=1;i<=rem;i++) html+=`<div class="cal-day other-month"><div class="cal-dn">${i}</div></div>`;
+
+  grid.innerHTML=html;
+}
+
+function calShowDay(iso){
+  // Abre el briefing filtrado por ese día
+  const tasks=allTasks().filter(t=>getDate(t)===iso);
+  if(!tasks.length) return;
+  const parts=iso.split('-');
+  const label=`${parseInt(parts[2])} de ${MONTHS_ES[parseInt(parts[1])-1]} ${parts[0]}`;
+  document.getElementById('brief-title').textContent='📅 Tareas — '+label;
+  document.getElementById('brief-sub').textContent=tasks.length+' tarea'+(tasks.length>1?'s':'');
+  const list=document.getElementById('brief-list'); list.innerHTML='';
+  tasks.forEach(t=>{
+    const ov=isOverdue(t); const s=SENDERS[t.who]||{label:t.who};
+    const stL={'URGENTE':'🔴 Urgente','EN PROCESO':'🔵 En proceso','PENDIENTE':'⚪ Pendiente','LISTO':'✅ Listo'};
+    const li=document.createElement('div');
+    li.className='brief-item '+(ov?'overdue':(isToday(t)?'today':''));
+    let metaHtml=`<span class="brief-meta-pill">${stL[ST[t.id]]||ST[t.id]}</span>`;
+    if(t.amt>0) metaHtml+=`<span class="brief-meta-amt">${fmtMXN(t.amt)}</span>`;
+    li.innerHTML=
+      `<div class="brief-item-hdr"><span class="brief-item-title">${t.title}</span><span class="brief-item-who">${s.label}</span></div>`+
+      `<div class="brief-item-meta">${metaHtml}</div>`+
+      `<div class="brief-item-acts">`+
+        `<button class="brief-act brief-act-done"  onclick="briefDone('${t.id}')">✅ Listo</button>`+
+        `<button class="brief-act brief-act-sched" onclick="briefReschedule('${t.id}')">📅 Nueva fecha</button>`+
+        `<button class="brief-act brief-act-edit"  onclick="briefEdit('${t.id}')">✏️ Ver / editar</button>`+
+      `</div>`;
+    list.appendChild(li);
+  });
+  document.getElementById('ov-brief').classList.add('open');
+}
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+load();loadCustom();setMail(mailMode);initTooltip();autoExpire();render();
+setTimeout(()=>{checkBriefing();handleHash();},300);
+</script>
+</body>
+</html>
