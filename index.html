@@ -8,6 +8,63 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#EDF1F7;color:#1a1a2e;min-height:100vh;}
 
+/* ─── LOGIN SCREEN ─── */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#1F3864 0%,#2E75B6 100%);display:flex;align-items:center;justify-content:center;z-index:9999;}
+#login-screen.hidden{display:none;}
+.login-card{background:white;border-radius:18px;padding:36px 32px 28px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.35);text-align:center;}
+.login-logo{font-size:36px;margin-bottom:8px;}
+.login-title{font-size:18px;font-weight:800;color:#1F3864;margin-bottom:4px;}
+.login-sub{font-size:12px;color:#888;margin-bottom:22px;}
+.login-users{display:flex;gap:10px;margin-bottom:20px;}
+.login-user-btn{flex:1;padding:14px 8px;border:2px solid #E0E6EF;border-radius:12px;background:#F7F9FC;cursor:pointer;transition:all .18s;font-size:13px;font-weight:700;color:#555;}
+.login-user-btn:hover{border-color:#2E75B6;background:#EBF3FB;}
+.login-user-btn.sel-P{border-color:#1D4ED8;background:#DBEAFE;color:#1D4ED8;}
+.login-user-btn.sel-S{border-color:#16A34A;background:#DCFCE7;color:#16A34A;}
+.login-user-btn .login-bdg{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:white;margin:0 auto 6px;}
+.login-bdg-P{background:#1D4ED8;}
+.login-bdg-S{background:#16A34A;}
+.login-pin-row{display:flex;gap:8px;margin-bottom:10px;}
+#login-pin{flex:1;border:2px solid #DDE3EC;border-radius:9px;padding:11px 14px;font-size:18px;letter-spacing:6px;text-align:center;outline:none;transition:border-color .15s;font-family:monospace;}
+#login-pin:focus{border-color:#2E75B6;}
+#login-pin.error{border-color:#DC2626;animation:shake .3s;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.login-btn{background:#1F3864;color:white;border:none;border-radius:9px;padding:11px 18px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s;}
+.login-btn:hover{background:#2E75B6;}
+.login-btn:disabled{background:#AAB;cursor:not-allowed;}
+#login-error{font-size:11px;color:#DC2626;min-height:16px;margin-top:4px;}
+#login-lockout{font-size:12px;color:#B45309;background:#FEF3C7;border-radius:7px;padding:8px 12px;margin-top:8px;display:none;}
+.login-hint{font-size:10px;color:#AAB;margin-top:14px;}
+.login-change-link{font-size:11px;color:#2E75B6;margin-top:10px;cursor:pointer;text-decoration:underline;background:none;border:none;padding:0;}
+.login-change-link:hover{color:#1F3864;}
+
+/* ─── CHANGE PIN MODAL ─── */
+#ov-changepin{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:10000;opacity:0;pointer-events:none;transition:opacity .18s;}
+#ov-changepin.open{opacity:1;pointer-events:all;}
+.changepin-card{background:white;border-radius:18px;padding:30px 28px 24px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.35);}
+.changepin-title{font-size:16px;font-weight:800;color:#1F3864;margin-bottom:4px;text-align:center;}
+.changepin-sub{font-size:11px;color:#888;text-align:center;margin-bottom:20px;}
+.cp-field{margin-bottom:13px;}
+.cp-field label{display:block;font-size:10px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;}
+.cp-input{width:100%;border:2px solid #DDE3EC;border-radius:9px;padding:10px 14px;font-size:16px;letter-spacing:4px;text-align:center;font-family:monospace;outline:none;transition:border-color .15s;}
+.cp-input:focus{border-color:#2E75B6;}
+.cp-input.ok{border-color:#16A34A;}
+.cp-input.err{border-color:#DC2626;animation:shake .3s;}
+.cp-match{font-size:10px;min-height:14px;margin-top:3px;}
+.cp-match.ok{color:#16A34A;}
+.cp-match.err{color:#DC2626;}
+.cp-strength{display:flex;gap:4px;margin-top:5px;}
+.cp-strength-bar{flex:1;height:4px;border-radius:3px;background:#E5E7EB;transition:background .2s;}
+.cp-strength-bar.w{background:#DC2626;}
+.cp-strength-bar.m{background:#F59E0B;}
+.cp-strength-bar.s{background:#16A34A;}
+.cp-actions{display:flex;gap:8px;margin-top:18px;}
+.cp-btn-save{flex:1;background:#1F3864;color:white;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;}
+.cp-btn-save:hover{background:#2E75B6;}
+.cp-btn-save:disabled{background:#AAB;cursor:not-allowed;}
+.cp-btn-cancel{background:#F2F4F7;color:#555;border:none;border-radius:9px;padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;}
+.cp-btn-cancel:hover{background:#E0E4EC;}
+#cp-error{font-size:11px;color:#DC2626;min-height:14px;text-align:center;margin-top:6px;}
+
 /* ─── HEADER ─── */
 header{background:linear-gradient(135deg,#1F3864 0%,#2E75B6 100%);color:white;padding:11px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 3px 14px rgba(0,0,0,.28);position:sticky;top:0;z-index:300;flex-wrap:wrap;gap:8px;}
 header h1{font-size:16px;font-weight:700;}
@@ -277,6 +334,62 @@ header .sub{font-size:10px;opacity:.7;margin-top:1px;}
 </head>
 <body>
 
+<!-- ══ PANTALLA DE LOGIN ══ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">🔐</div>
+    <div class="login-title">Tablero Barcón &amp; Mijares</div>
+    <div class="login-sub">Selecciona tu perfil e ingresa tu PIN</div>
+    <div class="login-users">
+      <button class="login-user-btn" id="login-btn-P" onclick="loginSelectUser('P')">
+        <div class="login-bdg login-bdg-P">P</div>
+        Pancho
+      </button>
+      <button class="login-user-btn" id="login-btn-S" onclick="loginSelectUser('S')">
+        <div class="login-bdg login-bdg-S">S</div>
+        Santiago
+      </button>
+    </div>
+    <div class="login-pin-row">
+      <input id="login-pin" type="password" maxlength="20" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()" autocomplete="off">
+      <button class="login-btn" id="login-submit" onclick="doLogin()" disabled>→</button>
+    </div>
+    <div id="login-error"></div>
+    <div id="login-lockout">🔒 Demasiados intentos. Espera <span id="lockout-timer">60</span>s</div>
+    <div class="login-hint">La sesión expira al cerrar el navegador</div>
+    <button class="login-change-link" onclick="openChangePIN()">🔑 Cambiar mi PIN</button>
+  </div>
+</div>
+
+<!-- ══ MODAL: CAMBIAR PIN ══ -->
+<div id="ov-changepin">
+  <div class="changepin-card">
+    <div class="changepin-title">🔑 Cambiar PIN</div>
+    <div class="changepin-sub" id="cp-who-label">Selecciona tu perfil primero</div>
+
+    <div class="cp-field">
+      <label>PIN actual</label>
+      <input class="cp-input" id="cp-current" type="password" maxlength="20" placeholder="••••••" autocomplete="off">
+    </div>
+    <div class="cp-field">
+      <label>Nuevo PIN</label>
+      <input class="cp-input" id="cp-new1" type="password" maxlength="20" placeholder="••••••" autocomplete="new-password" oninput="cpCheckStrength();cpCheckMatch()">
+      <div class="cp-strength"><div class="cp-strength-bar" id="csb1"></div><div class="cp-strength-bar" id="csb2"></div><div class="cp-strength-bar" id="csb3"></div></div>
+    </div>
+    <div class="cp-field">
+      <label>Confirmar nuevo PIN</label>
+      <input class="cp-input" id="cp-new2" type="password" maxlength="20" placeholder="••••••" autocomplete="new-password" oninput="cpCheckMatch()">
+      <div class="cp-match" id="cp-match-msg"></div>
+    </div>
+
+    <div id="cp-error"></div>
+    <div class="cp-actions">
+      <button class="cp-btn-cancel" onclick="closeChangePIN()">Cancelar</button>
+      <button class="cp-btn-save" id="cp-save-btn" onclick="doChangePIN()" disabled>💾 Guardar nuevo PIN</button>
+    </div>
+  </div>
+</div>
+
 <header>
   <div>
     <h1>PENDIENTES — BARCÓN &amp; MIJARES</h1>
@@ -288,6 +401,7 @@ header .sub{font-size:10px;opacity:.7;margin-top:1px;}
     <button class="btn-hdr" onclick="reopenBriefing()" title="Ver pendientes del día">📋 Pendientes</button>
     <button class="btn-new" onclick="openNewTask()">＋ Nueva tarea</button>
     <button class="btn-hdr" onclick="resetAll()">↺ Reiniciar</button>
+    <button class="btn-hdr" id="btn-logout" onclick="doLogout()" title="Cerrar sesión" style="background:rgba(220,38,38,.25);border-color:rgba(255,100,100,.4);">🔒 <span id="hdr-user-label"></span></button>
   </div>
 </header>
 
@@ -817,8 +931,8 @@ function render(){
 
     div.innerHTML=`
       <div class="card-row1">
-        <div class="card-title">${task.title}</div>
-        <button class="card-edit-btn" onclick="openEdit('${task.id}',event)" title="Editar tarea">✏️</button>
+        <div class="card-title">${esc(task.title)}</div>
+        <button class="card-edit-btn" onclick="openEdit('${esc(task.id)}',event)" title="Editar tarea">✏️</button>
         <div class="card-badges"><span class="bdg bdg-${task.who}">${task.who}</span>${tagHtml}</div>
       </div>
       <div class="card-row2">
@@ -1183,8 +1297,8 @@ function buildBriefList(hoy,venc){
     li.innerHTML=
       `<div class="brief-item-hdr">`+
         `<span class="brief-tag ${ov?'ov':'td'}">${ov?'⚠️ VENCIDA':'📅 HOY'}</span>`+
-        `<span class="brief-item-title">${t.title}</span>`+
-        `<span class="brief-item-who">${s.label}</span>`+
+        `<span class="brief-item-title">${esc(t.title)}</span>`+
+        `<span class="brief-item-who">${esc(s.label)}</span>`+
       `</div>`+
       `<div class="brief-item-meta">${metaHtml}</div>`+
       `<div class="brief-item-acts">`+
@@ -1532,7 +1646,7 @@ function renderCalendar(){
     tasks.slice(0,maxShow).forEach(t=>{
       const stC=ST_CODE[ST[t.id]]||'P';
       const short=t.title.split('—')[0].trim().slice(0,22);
-      pillsHtml+=`<span class="cal-pill cp-${stC}" onclick="openEdit('${t.id}',event)" title="${t.title}">${short}</span>`;
+      pillsHtml+=`<span class="cal-pill cp-${stC}" onclick="openEdit('${esc(t.id)}',event)" title="${esc(t.title)}">${esc(short)}</span>`;
     });
     if(tasks.length>maxShow) pillsHtml+=`<div class="cal-more" onclick="calShowDay('${iso}')">+${tasks.length-maxShow} más</div>`;
 
@@ -1564,7 +1678,7 @@ function calShowDay(iso){
     let metaHtml=`<span class="brief-meta-pill">${stL[ST[t.id]]||ST[t.id]}</span>`;
     if(t.amt>0) metaHtml+=`<span class="brief-meta-amt">${fmtMXN(t.amt)}</span>`;
     li.innerHTML=
-      `<div class="brief-item-hdr"><span class="brief-item-title">${t.title}</span><span class="brief-item-who">${s.label}</span></div>`+
+      `<div class="brief-item-hdr"><span class="brief-item-title">${esc(t.title)}</span><span class="brief-item-who">${esc(s.label)}</span></div>`+
       `<div class="brief-item-meta">${metaHtml}</div>`+
       `<div class="brief-item-acts">`+
         `<button class="brief-act brief-act-done"  onclick="briefDone('${t.id}')">✅ Listo</button>`+
@@ -1577,10 +1691,239 @@ function calShowDay(iso){
 }
 
 // ══════════════════════════════════════════════════
+// SEGURIDAD — XSS Escape
+// ══════════════════════════════════════════════════
+function esc(str){
+  return String(str||'')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;');
+}
+
+// ══════════════════════════════════════════════════
+// AUTENTICACIÓN — Login con PIN + SHA-256
+// ══════════════════════════════════════════════════
+// PINs por defecto: Pancho="Pancho2026" / Santiago="Santiago2026"
+// (SHA-256, calculados offline — no se almacena la contraseña)
+const PIN_HASHES_DEFAULT = {
+  P: '345420342ee4833c3193e1fd83f7a3568a54959333344db59fcaf89633605777',
+  S: '0261c56cf0391decfaaa12c72840f992470185858e1f26966b18c4033f5dadd6'
+};
+// Usa hashes personalizados de localStorage si existen, si no usa los por defecto
+function getPinHash(who){
+  return localStorage.getItem('kb_pin_'+who) || PIN_HASHES_DEFAULT[who];
+}
+const SESSION_TIMEOUT_MS = 8 * 60 * 60 * 1000; // 8 horas
+const MAX_ATTEMPTS = 3;
+const LOCKOUT_SECS = 60;
+
+let loginUser = null;
+let loginAttempts = 0;
+let lockoutTimer = null;
+
+async function sha256(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function loginSelectUser(who){
+  loginUser = who;
+  document.getElementById('login-btn-P').className = 'login-user-btn' + (who==='P'?' sel-P':'');
+  document.getElementById('login-btn-S').className = 'login-user-btn' + (who==='S'?' sel-S':'');
+  document.getElementById('login-submit').disabled = false;
+  document.getElementById('login-pin').focus();
+  document.getElementById('login-error').textContent = '';
+}
+
+async function doLogin(){
+  if(!loginUser){ document.getElementById('login-error').textContent='Selecciona tu perfil primero.'; return; }
+  if(lockoutTimer){ return; }
+
+  const pin = document.getElementById('login-pin').value;
+  if(!pin){ document.getElementById('login-error').textContent='Ingresa tu PIN.'; return; }
+
+  const hash = await sha256(pin);
+  if(hash === getPinHash(loginUser)){
+    // Éxito
+    loginAttempts = 0;
+    sessionStorage.setItem('kb_user', loginUser);
+    sessionStorage.setItem('kb_auth', Date.now().toString());
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('hdr-user-label').textContent = loginUser==='P'?'Pancho':'Santiago';
+    initBoard();
+  } else {
+    loginAttempts++;
+    const input = document.getElementById('login-pin');
+    input.value = '';
+    input.classList.add('error');
+    setTimeout(()=>input.classList.remove('error'),400);
+
+    if(loginAttempts >= MAX_ATTEMPTS){
+      // Bloquear
+      document.getElementById('login-submit').disabled = true;
+      document.getElementById('login-error').textContent = '';
+      const lockEl = document.getElementById('login-lockout');
+      const timerEl = document.getElementById('lockout-timer');
+      lockEl.style.display = 'block';
+      let secs = LOCKOUT_SECS;
+      timerEl.textContent = secs;
+      lockoutTimer = setInterval(()=>{
+        secs--;
+        timerEl.textContent = secs;
+        if(secs<=0){
+          clearInterval(lockoutTimer); lockoutTimer=null;
+          loginAttempts=0;
+          lockEl.style.display='none';
+          document.getElementById('login-submit').disabled = !loginUser;
+        }
+      },1000);
+    } else {
+      document.getElementById('login-error').textContent =
+        'PIN incorrecto. ' + (MAX_ATTEMPTS - loginAttempts) + ' intento(s) restante(s).';
+    }
+  }
+}
+
+function checkSession(){
+  const user = sessionStorage.getItem('kb_user');
+  const auth = sessionStorage.getItem('kb_auth');
+  if(!user || !auth) return false;
+  if(Date.now() - parseInt(auth) > SESSION_TIMEOUT_MS){
+    sessionStorage.removeItem('kb_user');
+    sessionStorage.removeItem('kb_auth');
+    return false;
+  }
+  return user;
+}
+
+function doLogout(){
+  if(!confirm('¿Cerrar sesión?')) return;
+  sessionStorage.removeItem('kb_user');
+  sessionStorage.removeItem('kb_auth');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('login-pin').value='';
+  document.getElementById('login-error').textContent='';
+  loginUser=null; loginAttempts=0;
+  document.getElementById('login-btn-P').className='login-user-btn';
+  document.getElementById('login-btn-S').className='login-user-btn';
+  document.getElementById('login-submit').disabled=true;
+}
+
+// ══════════════════════════════════════════════════
+// CAMBIAR PIN
+// ══════════════════════════════════════════════════
+let cpUser = null;
+
+function openChangePIN(){
+  // Usa el usuario ya seleccionado en login, o pide que seleccione
+  cpUser = loginUser;
+  const label = cpUser ? (cpUser==='P'?'Pancho':'Santiago') : '— selecciona tu perfil primero —';
+  document.getElementById('cp-who-label').textContent = cpUser ? '👤 '+label : 'Selecciona tu perfil primero';
+  document.getElementById('cp-current').value='';
+  document.getElementById('cp-new1').value='';
+  document.getElementById('cp-new2').value='';
+  document.getElementById('cp-error').textContent='';
+  document.getElementById('cp-match-msg').textContent='';
+  document.getElementById('cp-match-msg').className='cp-match';
+  document.getElementById('cp-save-btn').disabled=true;
+  ['cp-current','cp-new1','cp-new2'].forEach(id=>{
+    document.getElementById(id).className='cp-input';
+  });
+  ['csb1','csb2','csb3'].forEach(id=>document.getElementById(id).className='cp-strength-bar');
+  document.getElementById('ov-changepin').classList.add('open');
+  setTimeout(()=>document.getElementById('cp-current').focus(),100);
+}
+
+function closeChangePIN(){
+  document.getElementById('ov-changepin').classList.remove('open');
+}
+
+function cpCheckStrength(){
+  const val = document.getElementById('cp-new1').value;
+  const len = val.length;
+  const hasNum = /\d/.test(val);
+  const hasLetter = /[a-zA-Z]/.test(val);
+  const hasSpecial = /[^a-zA-Z0-9]/.test(val);
+  let score = 0;
+  if(len >= 6) score++;
+  if(len >= 8 && (hasNum || hasLetter)) score++;
+  if(len >= 8 && hasNum && hasLetter && hasSpecial) score++;
+  const colors = ['','w','m','s'];
+  const labels = ['','weak','medium','strong'];
+  for(let i=1;i<=3;i++){
+    const bar = document.getElementById('csb'+i);
+    bar.className = 'cp-strength-bar' + (i<=score ? ' '+colors[score] : '');
+  }
+}
+
+function cpCheckMatch(){
+  const n1 = document.getElementById('cp-new1').value;
+  const n2 = document.getElementById('cp-new2').value;
+  const msg = document.getElementById('cp-match-msg');
+  const inp2 = document.getElementById('cp-new2');
+  if(!n2){ msg.textContent=''; msg.className='cp-match'; inp2.className='cp-input'; document.getElementById('cp-save-btn').disabled=true; return; }
+  if(n1===n2 && n1.length>=4){
+    msg.textContent='✅ Los PINs coinciden';
+    msg.className='cp-match ok';
+    inp2.className='cp-input ok';
+    document.getElementById('cp-save-btn').disabled=false;
+  } else {
+    msg.textContent = n1!==n2 ? '❌ Los PINs no coinciden' : '❌ Mínimo 4 caracteres';
+    msg.className='cp-match err';
+    inp2.className='cp-input err';
+    document.getElementById('cp-save-btn').disabled=true;
+  }
+}
+
+async function doChangePIN(){
+  if(!cpUser){ document.getElementById('cp-error').textContent='Selecciona tu perfil primero.'; return; }
+  const current = document.getElementById('cp-current').value;
+  const new1    = document.getElementById('cp-new1').value;
+  const new2    = document.getElementById('cp-new2').value;
+
+  if(!current){ document.getElementById('cp-error').textContent='Ingresa tu PIN actual.'; return; }
+  if(!new1 || new1.length < 4){ document.getElementById('cp-error').textContent='El nuevo PIN debe tener al menos 4 caracteres.'; return; }
+  if(new1 !== new2){ document.getElementById('cp-error').textContent='Los nuevos PINs no coinciden.'; return; }
+  if(current === new1){ document.getElementById('cp-error').textContent='El nuevo PIN debe ser diferente al actual.'; return; }
+
+  // Verificar PIN actual
+  const hashCurrent = await sha256(current);
+  if(hashCurrent !== getPinHash(cpUser)){
+    document.getElementById('cp-error').textContent='El PIN actual es incorrecto.';
+    const inp = document.getElementById('cp-current');
+    inp.value=''; inp.className='cp-input err';
+    setTimeout(()=>inp.className='cp-input',500);
+    return;
+  }
+
+  // Guardar nuevo hash en localStorage
+  const hashNew = await sha256(new1);
+  localStorage.setItem('kb_pin_'+cpUser, hashNew);
+
+  closeChangePIN();
+  const nombre = cpUser==='P'?'Pancho':'Santiago';
+  alert('✅ PIN de '+nombre+' actualizado correctamente.\nLa próxima vez ingresa con tu nuevo PIN.');
+}
+
+function initBoard(){
+  load();loadCustom();setMail(mailMode);initTooltip();autoExpire();render();
+  setTimeout(()=>{checkBriefing();handleHash();},300);
+}
+
+// ══════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════
-load();loadCustom();setMail(mailMode);initTooltip();autoExpire();render();
-setTimeout(()=>{checkBriefing();handleHash();},300);
+(function(){
+  const user = checkSession();
+  if(user){
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('hdr-user-label').textContent = user==='P'?'Pancho':'Santiago';
+    initBoard();
+  }
+  // Si no hay sesión válida, la pantalla de login permanece visible
+})();
 </script>
 </body>
 </html>
