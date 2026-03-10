@@ -423,11 +423,8 @@ header .sub{font-size:10px;opacity:.7;margin-top:1px;}
       <button class="rem-opt" onclick="remAction('wa')">
         <span class="ico">💬</span><div class="det"><strong>Recordatorio por WhatsApp</strong><small>Abre WhatsApp con el mensaje listo para enviarte a ti mismo</small></div>
       </button>
-      <button class="rem-opt" onclick="remAction('mail')">
-        <span class="ico">📧</span><div class="det"><strong>Recordatorio por correo</strong><small>Redacta el correo de recordatorio con instrucciones de Sí / No</small></div>
-      </button>
     </div>
-    <button class="rem-all" onclick="remAll()">🚀 Activar los tres recordatorios</button>
+    <button class="rem-all" onclick="remAll()">🚀 Activar los dos recordatorios</button>
     <button onclick="closeOvD('ov-rem')" style="display:block;width:calc(100% - 34px);margin:0 17px 16px;background:none;border:none;color:#AAB;font-size:12px;cursor:pointer;padding:6px;text-decoration:underline;">Ahora no, cerrar</button>
   </div>
 </div>
@@ -635,8 +632,10 @@ function notifyScript(action, payload) {
 // DATOS
 // ══════════════════════════════════════════════════
 const SENDERS = {
-  P:{name:'Francisco Mijares',email:'panchingasm@gmail.com',     label:'Pancho',  bg:'#DBEAFE',color:'#1D4ED8'},
-  S:{name:'Santiago Barcón',  email:'sanbarcon@gmail.com',       label:'Santiago',bg:'#DCFCE7',color:'#15803D'}
+  P:{name:'Francisco Mijares',email:'panchingasm@gmail.com',     label:'Pancho',  bg:'#DBEAFE',color:'#1D4ED8',
+     phone:'525513840659'},   // Francisco Mijares
+  S:{name:'Santiago Barcón',  email:'sanbarcon@gmail.com',       label:'Santiago',bg:'#DCFCE7',color:'#15803D',
+     phone:'525580642367'}    // Santiago Barcón
 };
 
 // Calendario compartido Barcón & Mijares
@@ -949,7 +948,6 @@ function remAction(type){
   closeOvD('ov-rem');
   if(type==='cal') openCalOvFor(curId);
   if(type==='wa')  doWA(curId,null);
-  if(type==='mail'){openMail(curId,null);buildReminderMail(curId);}
 }
 
 function remAll(){
@@ -959,36 +957,6 @@ function remAll(){
   window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(det)}&add=${encodeURIComponent(SENDERS.P.email)}&add=${encodeURIComponent(SENDERS.S.email)}`,'_blank');
   // 2. WhatsApp
   setTimeout(()=>doWA(curId,null),600);
-  // 3. Email
-  setTimeout(()=>{openMail(curId,null);buildReminderMail(curId);},1100);
-}
-
-function buildReminderMail(id){
-  const task=allTasks().find(t=>t.id===id);
-  const sender=SENDERS[task.who];
-  const d=getDate(task);
-  const subj=`⏰ [RECORDATORIO] ${task.title} | ${fmtDate(d)}`;
-  const body=
-`Hola ${sender.label},
-
-Este es tu recordatorio para el día ${fmtDateFull(d)}:
-
-📋 Tarea: ${task.title}
-📅 Fecha: ${fmtDateFull(d)}
-👤 Responsable: ${sender.label}
-${task.amt?'💰 Monto: '+fmtMXN(task.amt)+'\n':''}
-── ── ──
-¿Completaste esta tarea?
-
-  ✅ SÍ → Abre el tablero y arrástrala a la columna LISTO
-  ❌ NO → Abre el tablero, haz clic en la fecha y elige una nueva fecha (se activarán los recordatorios automáticamente)
-
-Tablero: Kanban_Barcon_Mijares.html
-
-${sender.name}
-${sender.email}`;
-  document.getElementById('mail-subj').value=subj;
-  document.getElementById('mail-body').value=body;
 }
 
 // ══════════════════════════════════════════════════
@@ -1147,7 +1115,9 @@ function doWA(id,e){
 _(se activarán los recordatorios con la nueva fecha)_
 
 _Tablero Barcón & Mijares_`;
-  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  // Si el número está configurado, abre directo al responsable; si no, abre WhatsApp genérico
+  const phone = sender.phone && !sender.phone.includes('X') ? sender.phone : '';
+  window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
 }
 
 // ══════════════════════════════════════════════════
