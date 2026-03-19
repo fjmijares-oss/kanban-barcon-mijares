@@ -401,6 +401,7 @@ header .sub{font-size:10px;opacity:.7;margin-top:1px;}
     <button class="btn-hdr" onclick="reopenBriefing()" title="Ver pendientes del día">📋 Pendientes</button>
     <button class="btn-new" onclick="openNewTask()">＋ Nueva tarea</button>
     <button class="btn-hdr" onclick="resetAll()">↺ Reiniciar</button>
+    <span id="sync-indicator" title="Estado de sincronización" style="font-size:10px;opacity:.8;display:flex;align-items:center;gap:4px;"></span>
     <button class="btn-hdr" id="btn-logout" onclick="doLogout()" title="Cerrar sesión" style="background:rgba(220,38,38,.25);border-color:rgba(255,100,100,.4);">🔒 <span id="hdr-user-label"></span></button>
   </div>
 </header>
@@ -729,17 +730,29 @@ header .sub{font-size:10px;opacity:.7;margin-top:1px;}
 // Pega aquí la URL de tu Apps Script después de desplegarlo
 // Ejemplo: 'https://script.google.com/macros/s/AKfycb.../exec'
 // ══════════════════════════════════════════════════
-const APPS_SCRIPT_URL = '';
+const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/devstar.mx/s/AKfycbz63F9Fp9BIhRSGNyJILPFi1vZqtI5_qNBhWoafZclqwRW5RoQYbtor9-oLURY1hY43/exec';
+
+let syncTimeout=null;
+function setSyncIndicator(state){
+  const el=document.getElementById('sync-indicator');
+  if(!el)return;
+  if(state==='syncing') el.innerHTML='🔄 Sincronizando…';
+  else if(state==='ok')  el.innerHTML='🟢 Sincronizado';
+  else                   el.innerHTML='🔴 Sin conexión';
+  clearTimeout(syncTimeout);
+  if(state==='ok') syncTimeout=setTimeout(()=>{if(el)el.innerHTML='';},4000);
+}
 
 function notifyScript(action, payload) {
-  if (!APPS_SCRIPT_URL) return; // Sin URL — tablero funciona igual sin conexión
-  try {
-    fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: JSON.stringify({ action, ...payload })
-    });
-  } catch(e) { /* silencioso si no hay red */ }
+  if (!APPS_SCRIPT_URL) return;
+  setSyncIndicator('syncing');
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    mode:   'no-cors',
+    body:   JSON.stringify({ action, ...payload })
+  })
+  .then(()=>setSyncIndicator('ok'))
+  .catch(()=>setSyncIndicator('error'));
 }
 
 // ══════════════════════════════════════════════════
@@ -913,10 +926,6 @@ function render(){
     div.setAttribute('data-id',task.id);
     div.addEventListener('dragstart',e=>{dragId=task.id;e.dataTransfer.setData('text/plain',task.id);setTimeout(()=>div.classList.add('dragging'),0);});
     div.addEventListener('dragend', ()=>{div.classList.remove('dragging');dragId=null;});
-    // Tooltip on hover
-    div.addEventListener('mouseenter',e=>{if(!div.classList.contains('dragging'))showTT(task,e);});
-    div.addEventListener('mousemove', e=>{posTT(e);});
-    div.addEventListener('mouseleave',()=>{hideTT();});
 
     const tagHtml=today?'<span class="tag tag-hoy">📅 HOY</span>':overdue?'<span class="tag tag-venc">⚠️ VENCIDA</span>':'';
     const amtHtml=task.amt?`<span class="card-amt${isEndOfMonth()?' eom':''}">${fmtMXN(task.amt)}</span>`:'';
@@ -957,6 +966,14 @@ function render(){
       ${ynBar}
       <div style="text-align:right;margin-top:3px;"><button onclick="deleteTask('${task.id}',event)" style="background:none;border:none;font-size:10px;color:#CCC;cursor:pointer;padding:0;transition:color .13s;" onmouseover="this.style.color='#C62828'" onmouseout="this.style.color='#CCC'" title="Eliminar tarea">🗑 eliminar</button></div>
     `;
+    // Tooltip solo sobre el badge (círculo P/S)
+    const bdg=div.querySelector('.bdg');
+    if(bdg){
+      bdg.style.cursor='help';
+      bdg.addEventListener('mouseenter',e=>{e.stopPropagation();if(!div.classList.contains('dragging'))showTT(task,e);});
+      bdg.addEventListener('mousemove', e=>{posTT(e);});
+      bdg.addEventListener('mouseleave',()=>{hideTT();});
+    }
     cont.appendChild(div);
   });
 
@@ -1452,8 +1469,9 @@ function deleteTask(id,e){
   customTasks=customTasks.filter(t=>t.id!==id);
   delete ST[id];delete dates[id];delete contacts[id];delete doneAt[id];
   saveCustom();save();
+  // Sincronizar: eliminar del Calendar y de Sheets
+  notifyScript('deleteTask',{id});
   render();
-  // Si la pestaña de calendario está activa, refrescarla también
   if(document.getElementById('cal-view').classList.contains('active')) renderCalendar();
 }
 
@@ -1481,7 +1499,7 @@ function showTT(task,e){
   if(task.email||contacts[task.id])html+=`<div class="tt-row"><span class="tt-lbl">Correo</span><span class="tt-val">${task.email||contacts[task.id]}</span></div>`;
   const notas=task.notas||'';
   if(notas)html+=`<div class="tt-notes">${notas.slice(0,120)}${notas.length>120?'…':''}</div>`;
-  html+=`<div class="tt-hint">✏️ clic para editar</div>`;
+  html+=`<div class="tt-hint">✏️ usa el lápiz en la tarjeta para editar</div>`;
   ttEl.innerHTML=html;
   ttEl.classList.add('show');
   posTT(e);
